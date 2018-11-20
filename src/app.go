@@ -21,6 +21,7 @@ type application struct {
 	isFullscreen bool
 	canvas       *bitmap
 	canvasPos    sdl.Rect
+	assets       *assetPack
 }
 
 // Initialize SDL2 content
@@ -307,7 +308,7 @@ func (app *application) destroy() {
 	app.window.Destroy()
 }
 
-// Create
+// Run
 func (app *application) run() error {
 
 	// Initialize scenes
@@ -316,7 +317,7 @@ func (app *application) run() error {
 	for i := 0; i < len(app.scenes); i++ {
 
 		s = app.scenes[i]
-		err = s.init(app.g)
+		err = s.init(app.g, app.assets)
 		if err != nil {
 
 			return err
@@ -334,6 +335,15 @@ func (app *application) run() error {
 	}
 	// Destroy application
 	app.destroy()
+
+	return err
+}
+
+// Load assets (before running!)
+func (app *application) loadAssets(bmpList, bmpNames, mapList, mapNames []string) error {
+
+	var err error
+	app.assets, err = createAssetPack(app.g, bmpList, bmpNames, mapList, mapNames)
 
 	return err
 }

@@ -19,24 +19,15 @@ type game struct {
 }
 
 // Initialize
-func (t *game) init(g *graphics) error {
+func (t *game) init(g *graphics, ass *assetPack) error {
 
 	fmt.Println("Let's init the game!")
 
 	t.pos = 0
 
 	// Load test bitmaps
-	var err error
-	t.bmpGoat, err = loadBitmap(g, "assets/bitmaps/goat.png")
-	if err != nil {
-
-		return err
-	}
-	t.bmpFont, err = loadBitmap(g, "assets/bitmaps/font.png")
-	if err != nil {
-
-		return err
-	}
+	t.bmpGoat = ass.getBitmap("goat")
+	t.bmpFont = ass.getBitmap("font")
 
 	// Create goat sprite
 	t.sprGoat = createSprite(32, 32)

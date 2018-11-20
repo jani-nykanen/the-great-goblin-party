@@ -5,7 +5,7 @@ package main
 
 // Scene interface
 type scene interface {
-	init(g *graphics) error
+	init(g *graphics, ass *assetPack) error
 	update(input *inputManager, tm float32)
 	draw(g *graphics)
 	destroy()
