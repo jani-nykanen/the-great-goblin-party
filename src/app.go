@@ -15,9 +15,12 @@ type application struct {
 	currentScene *scene
 	conf         config
 	window       *sdl.Window
+	winID        uint32
 	rend         *sdl.Renderer
 	input        *inputManager
 	isFullscreen bool
+	canvas       *bitmap
+	canvasPos    sdl.Rect
 }
 
 // Initialize SDL2 content
@@ -39,6 +42,9 @@ func (app *application) initSDL() error {
 	if err != nil {
 		return err
 	}
+	app.winID, _ = app.window.GetID()
+	// Calculate canvas info
+	app.resizeEvent(app.conf.winWidth, app.conf.winHeight)
 
 	// Toggle fullscreen if necessary
 	app.isFullscreen = false
@@ -83,6 +89,15 @@ func (app *application) init(conf config) error {
 		return err
 	}
 
+	// Create canvas
+	app.canvas, err = createEmptyBitmap(app.g,
+		app.conf.canvasWidth,
+		app.conf.canvasHeight,
+		true)
+	if err != nil {
+		return err
+	}
+
 	// Create a slice for scenes
 	app.scenes = make([]scene, 0)
 	// Set current scene to nil
@@ -105,6 +120,29 @@ func (app *application) toggleFullscreen() {
 		app.window.SetFullscreen(0)
 	}
 	app.isFullscreen = !app.isFullscreen
+}
+
+// Resize event
+func (app *application) resizeEvent(w, h int32) {
+
+	// Check if horizontal aspect ratio
+	// and update canvas position & size info
+	if float32(w)/float32(h) >= float32(app.conf.canvasWidth)/float32(app.conf.canvasHeight) {
+
+		app.canvasPos.H = h
+		app.canvasPos.W = int32(float32(h) / float32(app.conf.canvasHeight) * float32(app.conf.canvasWidth))
+
+		app.canvasPos.Y = 0
+		app.canvasPos.X = w/2 - app.canvasPos.W/2
+
+	} else {
+
+		app.canvasPos.W = w
+		app.canvasPos.H = int32(float32(w) / float32(app.conf.canvasWidth) * float32(app.conf.canvasHeight))
+
+		app.canvasPos.X = 0
+		app.canvasPos.Y = h/2 - app.canvasPos.H/2
+	}
 }
 
 // Poll events
@@ -132,6 +170,17 @@ func (app *application) pollEvents() {
 			}
 			break
 
+		// Window event
+		case *sdl.WindowEvent:
+
+			if t.WindowID == app.winID &&
+				t.Event == sdl.WINDOWEVENT_RESIZED {
+
+				app.resizeEvent(t.Data1, t.Data2)
+			}
+
+			break
+
 		default:
 			break
 		}
@@ -148,11 +197,14 @@ func (app *application) loop() {
 	redraw := false
 	timeSum := uint32(0)
 	oldTime := sdl.GetTicks()
+	newTime := oldTime
 
 	for app.running {
 
 		// Add time
-		timeSum += sdl.GetTicks() - oldTime
+		oldTime = newTime
+		newTime = sdl.GetTicks()
+		timeSum += newTime - oldTime
 
 		waitCount = 0
 		for timeSum >= wait {
@@ -177,10 +229,12 @@ func (app *application) loop() {
 
 		// Redraw if necessary
 		if redraw {
-			app.draw()
+			app.drawToCanvas()
 			redraw = false
 		}
 
+		// Draw canvas (note: in every frame)
+		app.draw()
 		// Update frame
 		app.rend.Present()
 
@@ -220,14 +274,31 @@ func (app *application) update(delta float32) {
 	}
 }
 
-// Draw
-func (app *application) draw() {
+// Draw to canvas
+func (app *application) drawToCanvas() {
+
+	app.g.setRenderTarget(app.canvas)
 
 	// Draw the current scene
 	if app.currentScene != nil {
 
 		(*app.currentScene).draw(app.g)
 	}
+
+	app.g.setRenderTarget(nil)
+}
+
+// Draw
+func (app *application) draw() {
+
+	app.g.clearScreen(0, 0, 0)
+
+	// Draw canvas content
+	app.drawToCanvas()
+
+	// Draw canvas
+	app.g.drawScaledBitmap(app.canvas, app.canvasPos.X, app.canvasPos.Y,
+		app.canvasPos.W, app.canvasPos.H)
 }
 
 // Destroy
@@ -245,7 +316,7 @@ func (app *application) run() error {
 	for i := 0; i < len(app.scenes); i++ {
 
 		s = app.scenes[i]
-		err = s.init()
+		err = s.init(app.g)
 		if err != nil {
 
 			return err

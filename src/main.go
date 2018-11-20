@@ -31,5 +31,8 @@ func main() {
 	g := new(game)
 	app.addScene(g, true)
 
-	app.run()
+	err = app.run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
