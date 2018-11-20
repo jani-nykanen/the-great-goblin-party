@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 // Main file
@@ -24,6 +26,15 @@ func main() {
 	mapPaths := ([]string)(nil)
 	mapNames := ([]string)(nil)
 
+	// Key configuration
+	kconf := createKeyConfig()
+	kconf.addButton("right", sdl.SCANCODE_RIGHT)
+	kconf.addButton("up", sdl.SCANCODE_UP)
+	kconf.addButton("left", sdl.SCANCODE_LEFT)
+	kconf.addButton("down", sdl.SCANCODE_DOWN)
+	kconf.addButton("start", sdl.SCANCODE_RETURN)
+	kconf.addButton("back", sdl.SCANCODE_ESCAPE)
+
 	// Create default configuration
 	conf := config{
 		caption:      "Go Experiment",
@@ -42,6 +53,8 @@ func main() {
 		log.Fatal(err)
 		return
 	}
+	// Add key configuration
+	app.bindKeyConfig(kconf)
 	// Add scenes
 	g := new(game)
 	app.addScene(g, true)

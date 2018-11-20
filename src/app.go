@@ -348,6 +348,12 @@ func (app *application) loadAssets(bmpList, bmpNames, mapList, mapNames []string
 	return err
 }
 
+// Add a key configuration
+func (app *application) bindKeyConfig(kconf *keyConfig) {
+
+	app.input.bindKeyConfig(kconf)
+}
+
 // Add a scene
 func (app *application) addScene(s scene, makeCurrent bool) {
 

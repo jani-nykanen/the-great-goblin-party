@@ -6,8 +6,6 @@ package main
 import (
 	"fmt"
 	"math"
-
-	"github.com/veandco/go-sdl2/sdl"
 )
 
 // Game type
@@ -39,7 +37,7 @@ func (t *game) init(g *graphics, ass *assetPack) error {
 func (t *game) update(input *inputManager, tm float32) {
 
 	// Test
-	if input.getKey(sdl.SCANCODE_A) == statePressed {
+	if input.getButton("start") == statePressed {
 
 		fmt.Println("beep boop")
 	}

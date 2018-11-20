@@ -16,9 +16,36 @@ const (
 	keyMax        = 256
 )
 
+// Button
+type button struct {
+	key  sdl.Scancode
+	name string
+}
+
+// Key configuration
+type keyConfig struct {
+	buttons []button
+}
+
+// Create a key configuration
+func createKeyConfig() *keyConfig {
+
+	k := new(keyConfig)
+	k.buttons = make([]button, 0)
+
+	return k
+}
+
+// Add a button
+func (k *keyConfig) addButton(name string, key sdl.Scancode) {
+
+	k.buttons = append(k.buttons, button{name: name, key: key})
+}
+
 // Input manager class
 type inputManager struct {
-	keys [keyMax]int
+	keys  [keyMax]int
+	kconf *keyConfig
 }
 
 // Initialize
@@ -28,6 +55,12 @@ func (t *inputManager) init() {
 	for i := 0; i < keyMax; i++ {
 		t.keys[i] = stateUp
 	}
+}
+
+// Bind keyconfiguration
+func (t *inputManager) bindKeyConfig(kconf *keyConfig) {
+
+	t.kconf = kconf
 }
 
 // Key down
@@ -75,4 +108,19 @@ func (t *inputManager) getKey(key sdl.Scancode) int {
 	}
 
 	return t.keys[i]
+}
+
+// Get button state
+func (t *inputManager) getButton(name string) int {
+
+	// Find a corresponding button
+	for i := 0; i < len(t.kconf.buttons); i++ {
+
+		if name == t.kconf.buttons[i].name {
+
+			return t.getKey(t.kconf.buttons[i].key)
+		}
+	}
+
+	return stateUp
 }
