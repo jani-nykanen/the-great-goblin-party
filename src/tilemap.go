@@ -87,6 +87,16 @@ func (t tilemap) parseCSV(src string) []int {
 	return ret
 }
 
+// Get a tile
+func (t *tilemap) getTile(x, y int32) int {
+
+	if x < 0 || y < 0 || x >= int32(t.width) || y >= int32(t.height) {
+		return -1
+	}
+
+	return t.data[int(y)*t.width+int(x)]
+}
+
 // Load a tilemap from a file (with max 1 layer)
 func loadTilemap(path string) (*tilemap, error) {
 
