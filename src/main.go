@@ -18,13 +18,19 @@ func main() {
 	bmpPaths := []string{
 		"assets/bitmaps/font.png",
 		"assets/bitmaps/goat.png",
+		"assets/bitmaps/test_tiles.png",
 	}
 	bmpNames := []string{
 		"font",
 		"goat",
+		"testTiles",
 	}
-	mapPaths := ([]string)(nil)
-	mapNames := ([]string)(nil)
+	mapPaths := []string{
+		"assets/maps/1.tmx",
+	}
+	mapNames := []string{
+		"1",
+	}
 
 	// Key configuration
 	kconf := createKeyConfig()

@@ -12,9 +12,10 @@ import (
 
 // Tilemap type
 type tilemap struct {
-	data   []int
-	width  int
-	height int
+	data      []int
+	width     int
+	height    int
+	moveLimit int
 }
 
 // Get string parameter value
@@ -106,6 +107,9 @@ func loadTilemap(path string) (*tilemap, error) {
 	// Get CSV (=layer) data
 	csv := t.getCSV(content, "encoding=\"csv\"")
 	t.data = t.parseCSV(csv)
+
+	// Get move limit
+	t.moveLimit = t.getIntParamValue(content, "property name=\"moves\" value")
 
 	return t, nil
 }

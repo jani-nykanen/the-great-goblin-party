@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="10" height="8" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
+ <properties>
+  <property name="moves" value="10"/>
+ </properties>
+ <tileset firstgid="1" source="../../dev/editor_tiles.tsx"/>
+ <layer name="Tile layer 1" width="10" height="8">
+  <data encoding="csv">
+1,1,1,1,1,1,1,1,1,1,
+1,0,1,2,0,0,0,2,0,1,
+1,0,1,1,0,6,0,1,1,1,
+1,0,0,0,2,0,14,0,0,1,
+1,6,2,14,1,1,1,2,0,1,
+1,1,1,0,1,0,2,14,0,1,
+1,0,0,10,1,0,0,0,1,1,
+1,1,1,1,1,1,1,1,1,1
+</data>
+ </layer>
+</map>

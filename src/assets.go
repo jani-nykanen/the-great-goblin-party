@@ -82,7 +82,7 @@ func createAssetPack(g *graphics, bmpList, bmpNames, mapList, mapNames []string)
 	var m *tilemap
 	for i = 0; i < minInt(len(mapNames), len(mapList)); i++ {
 
-		m, err = loadTilemap(bmpList[i])
+		m, err = loadTilemap(mapList[i])
 		if err != nil {
 
 			return nil, err
