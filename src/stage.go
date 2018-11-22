@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	stageYOff = 0
+	stageYOff = 16
 )
 
 // Stage type
@@ -18,9 +18,29 @@ type stage struct {
 	height       int32
 	index        int
 	bmpTestTiles *bitmap
+	bmpFont      *bitmap
 	xpos         int32
 	ypos         int32
 	objects      []object
+}
+
+// Get difficulty string
+func (s *stage) getDifficultyString() string {
+
+	dif := s.baseMap.difficulty
+	ret := ""
+
+	// Full stars
+	for i := 0; i < int(dif/2); i++ {
+		ret += "#"
+	}
+
+	// Half stars
+	if dif%2 == 1 {
+		ret += "$"
+	}
+
+	return ret
 }
 
 // Update stage
@@ -33,8 +53,8 @@ func (s *stage) update(input *inputManager, tm float32) {
 	}
 }
 
-// Draw stage
-func (s *stage) draw(g *graphics) {
+// Draw map
+func (s *stage) drawMap(g *graphics) {
 
 	// "Shadow"
 	g.setGlobalColor(0, 0, 85, 255)
@@ -72,11 +92,55 @@ func (s *stage) draw(g *graphics) {
 		}
 	}
 
+}
+
+// Draw info
+func (s *stage) drawInfo(g *graphics) {
+
+	stageIndexY := int32(8)
+	nameY := int32(24)
+	xoff := int32(-6)
+	starXoff := int32(-3)
+	bottomY := int32(16)
+	bottomXOff := int32(2)
+	difMinusX := int32(-4)
+
+	// Draw stage index
+	g.drawText(s.bmpFont, "Stage "+strconv.Itoa(s.index),
+		128, stageIndexY, xoff, 0, true)
+	// Draw stage name
+	g.drawText(s.bmpFont, "\""+s.baseMap.name+"\"",
+		128, nameY, xoff, 0, true)
+
+	// Draw difficulty text
+	str := "Difficulty: "
+	g.drawText(s.bmpFont, "Difficulty: ",
+		bottomXOff, 240-bottomY, xoff, 0, false)
+	// Draw difficulty
+	g.drawText(s.bmpFont, s.getDifficultyString(),
+		bottomXOff+int32(len(str)*10)+difMinusX, 240-bottomY, starXoff, 0, false)
+
+	// Draw moves
+	str = "Moves: " + strconv.Itoa(s.baseMap.moveLimit)
+	g.drawText(s.bmpFont, str,
+		256-int32(len(str)+1)*10+bottomXOff,
+		240-bottomY, xoff, 0, false)
+}
+
+// Draw stage
+func (s *stage) draw(g *graphics) {
+
+	// Draw map
+	s.drawMap(g)
+
 	// Draw objects
 	for i := 0; i < len(s.objects); i++ {
 
 		s.objects[i].draw(g)
 	}
+
+	// Draw info
+	s.drawInfo(g)
 }
 
 // Add an object
@@ -93,6 +157,7 @@ func createStage(index int, ass *assetPack) *stage {
 	s.baseMap = ass.getTilemap(strconv.Itoa(index))
 	// Get assets
 	s.bmpTestTiles = ass.getBitmap("testTiles")
+	s.bmpFont = ass.getBitmap("font")
 	// Get data
 	s.width = int32(s.baseMap.width)
 	s.height = int32(s.baseMap.height)
