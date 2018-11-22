@@ -38,8 +38,6 @@ func (t *game) update(input *inputManager, tm float32) {
 // Draw
 func (t *game) draw(g *graphics) {
 
-	g.clearScreen(0, 85, 170)
-
 	// Draw stage
 	t.gameStage.draw(g)
 }

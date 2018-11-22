@@ -7,8 +7,9 @@ import (
 	"strconv"
 )
 
+// Constants
 const (
-	stageYOff = 16
+	stageYOff = 8
 )
 
 // Stage type
@@ -19,6 +20,8 @@ type stage struct {
 	index        int
 	bmpTestTiles *bitmap
 	bmpFont      *bitmap
+	bmpBorders   *bitmap
+	bmpWall      *bitmap
 	xpos         int32
 	ypos         int32
 	objects      []object
@@ -53,18 +56,64 @@ func (s *stage) update(input *inputManager, tm float32) {
 	}
 }
 
+// Draw borders
+func (s *stage) drawBorders(g *graphics) {
+
+	ypos := int32(s.ypos - 8)
+	xpos := int32(s.xpos - 8)
+	xjump := s.width*16 + 8
+	yjump := s.height*16 + 8
+	shadowJump := int32(12)
+
+	// "Shadow"
+	g.setGlobalColor(0, 8, 120, 255)
+	g.fillRect(xpos+shadowJump, ypos+shadowJump, xjump+8+2, yjump+8+2)
+
+	// Draw white outline
+	g.setGlobalColor(255, 255, 255, 255)
+	g.fillRect(xpos-1, ypos-1, xjump+8+2, yjump+8+2)
+
+	// Horizontal
+	for x := 0; x < int(s.width)*2; x++ {
+
+		// Top
+		g.drawBitmapRegion(s.bmpBorders, 8, 0, 8, 8,
+			s.xpos+int32(x)*8, ypos, flipNone)
+		// Bottom
+		g.drawBitmapRegion(s.bmpBorders, 8, 16, 8, 8,
+			s.xpos+int32(x)*8, ypos+yjump, flipNone)
+	}
+
+	// Vertical
+	for y := 0; y < int(s.height)*2; y++ {
+
+		// Left
+		g.drawBitmapRegion(s.bmpBorders, 0, 8, 8, 8,
+			xpos, s.ypos+int32(y)*8, flipNone)
+		// Right
+		g.drawBitmapRegion(s.bmpBorders, 16, 8, 8, 8,
+			xpos+xjump, s.ypos+int32(y)*8, flipNone)
+	}
+
+	// Corners
+	g.drawBitmapRegion(s.bmpBorders, 0, 0, 8, 8,
+		xpos, ypos, flipNone)
+	g.drawBitmapRegion(s.bmpBorders, 16, 0, 8, 8,
+		xpos+xjump, ypos, flipNone)
+	g.drawBitmapRegion(s.bmpBorders, 0, 16, 8, 8,
+		xpos, ypos+yjump, flipNone)
+	g.drawBitmapRegion(s.bmpBorders, 16, 16, 8, 8,
+		xpos+xjump, ypos+yjump, flipNone)
+}
+
 // Draw map
 func (s *stage) drawMap(g *graphics) {
 
-	// "Shadow"
-	g.setGlobalColor(0, 0, 85, 255)
-	g.fillRect(s.xpos-2+12, s.ypos-2+12, s.width*16+4, s.height*16+4)
+	// Clear screen
+	g.clearScreen(0, 72, 184)
 
-	// Borders
-	g.setGlobalColor(0, 0, 0, 255)
-	g.fillRect(s.xpos-2, s.ypos-2, s.width*16+4, s.height*16+4)
-	g.setGlobalColor(255, 255, 255, 255)
-	g.fillRect(s.xpos-1, s.ypos-1, s.width*16+2, s.height*16+2)
+	// Draw borders
+	s.drawBorders(g)
 
 	// Background
 	g.setGlobalColor(0, 0, 0, 255)
@@ -83,12 +132,19 @@ func (s *stage) drawMap(g *graphics) {
 			}
 
 			tileID--
+			// If wall
+			if tileID == 0 {
 
-			// Draw tile
-			sx = tileID % 16
-			sy = tileID / 16
-			g.drawBitmapRegion(s.bmpTestTiles, sx*16, sy*16, 16, 16,
-				int32(s.xpos+x*16), int32(s.ypos+y*16), flipNone)
+				g.drawBitmapRegion(s.bmpWall, 0, 0, 16, 16, int32(s.xpos+x*16), int32(s.ypos+y*16), flipNone)
+
+			} else {
+
+				// Draw tile
+				sx = tileID % 16
+				sy = tileID / 16
+				g.drawBitmapRegion(s.bmpTestTiles, sx*16, sy*16, 16, 16,
+					int32(s.xpos+x*16), int32(s.ypos+y*16), flipNone)
+			}
 		}
 	}
 
@@ -158,6 +214,8 @@ func createStage(index int, ass *assetPack) *stage {
 	// Get assets
 	s.bmpTestTiles = ass.getBitmap("testTiles")
 	s.bmpFont = ass.getBitmap("font")
+	s.bmpBorders = ass.getBitmap("borders")
+	s.bmpWall = ass.getBitmap("wall")
 	// Get data
 	s.width = int32(s.baseMap.width)
 	s.height = int32(s.baseMap.height)

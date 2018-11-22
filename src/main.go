@@ -19,11 +19,16 @@ func main() {
 		"assets/bitmaps/font.png",
 		"assets/bitmaps/goat.png",
 		"assets/bitmaps/test_tiles.png",
+		"assets/bitmaps/borders.png",
+		"assets/bitmaps/wall.png",
+		"",
 	}
 	bmpNames := []string{
 		"font",
 		"goat",
 		"testTiles",
+		"borders",
+		"wall",
 	}
 	mapPaths := []string{
 		"assets/maps/1.tmx",
@@ -43,7 +48,7 @@ func main() {
 
 	// Create default configuration
 	conf := config{
-		caption:      "Go Experiment",
+		caption:      "Super Yet Another Puzzle Game 3000",
 		winWidth:     512,
 		winHeight:    480,
 		canvasWidth:  256,
