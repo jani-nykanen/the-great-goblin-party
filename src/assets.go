@@ -13,15 +13,6 @@ type assetPack struct {
 	mapCount int
 }
 
-// Int min
-func minInt(a, b int) int {
-
-	if a < b {
-		return a
-	}
-	return b
-}
-
 // Get a bitmap
 func (ass *assetPack) getBitmap(name string) *bitmap {
 

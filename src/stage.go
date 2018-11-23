@@ -64,8 +64,8 @@ func (s *stage) parseObjects() {
 			if tileID >= 2 && tileID <= 4 {
 				s.addGremlin(x, y, tileID-2)
 				// If star
-			} else if tileID >= 4 && tileID <= 6 {
-				s.addStar(x, y, tileID-4)
+			} else if tileID >= 5 && tileID <= 7 {
+				s.addStar(x, y, tileID-5)
 			}
 		}
 	}
@@ -97,7 +97,7 @@ func (s *stage) update(input *inputManager, tm float32) {
 	s.anyMoving = false
 	for i := 0; i < len(s.gremlins); i++ {
 
-		if s.gremlins[i].moving {
+		if s.gremlins[i].isActive() {
 
 			s.anyMoving = true
 			break
@@ -108,6 +108,12 @@ func (s *stage) update(input *inputManager, tm float32) {
 	for i := 0; i < len(s.gremlins); i++ {
 
 		s.gremlins[i].update(input, s, tm)
+
+		// Update stars collisions
+		for i2 := 0; i2 < len(s.stars); i2++ {
+
+			s.gremlins[i].getStarCollision(s.stars[i2], s)
+		}
 	}
 	// Update gremlin collision
 	for i := 0; i < len(s.gremlins); i++ {

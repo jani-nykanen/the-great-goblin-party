@@ -23,7 +23,7 @@ func (st *star) animate(tm float32) {
 func (st *star) update(input *inputManager, s *stage, tm float32) {
 
 	// Update solid
-	s.updateSolid(int(st.x), int(st.y), 2)
+	s.updateSolid(int(st.x), int(st.y), 1)
 
 	// Animate
 	st.animate(tm)

@@ -20,10 +20,16 @@ type gremlin struct {
 	moving        bool
 	spr           sprite
 	color         int32
+	exist         bool
+	dying         bool
 }
 
 // Check collisions
 func (gr *gremlin) checkCollisions(s *stage) {
+
+	if !gr.exist {
+		return
+	}
 
 	// Check other gremlins
 	if gr.moving && s.isTileSolid(int(gr.tx), int(gr.ty)) == 2 {
@@ -166,10 +172,43 @@ func (gr *gremlin) animate(tm float32) {
 	gr.spr.animate(gr.spr.row, 0, 3, speed, tm)
 }
 
+// Die
+func (gr *gremlin) die(tm float32, s *stage) {
+
+	animSpeed := float32(8)
+
+	// Update virtual position
+	gr.vx = float32(gr.x) * 16.0
+	gr.vy = float32(gr.y) * 16.0
+
+	// Animate
+	gr.spr.animate(3, 0, 4, animSpeed, tm)
+	if gr.spr.frame == 4 {
+		gr.exist = false
+		s.addStar(gr.x, gr.y, gr.color)
+	}
+}
+
+// Is active
+func (gr *gremlin) isActive() bool {
+
+	return gr.exist && (gr.dying || gr.moving)
+}
+
 // Update
 func (gr *gremlin) update(input *inputManager, s *stage, tm float32) {
 
+	if !gr.exist {
+		return
+	}
+
 	gr.startedMoving = false
+
+	// Die
+	if gr.dying {
+		gr.die(tm, s)
+		return
+	}
 
 	// Control
 	gr.control(input, s, tm)
@@ -179,8 +218,28 @@ func (gr *gremlin) update(input *inputManager, s *stage, tm float32) {
 	gr.animate(tm)
 }
 
+// Check star collision
+func (gr *gremlin) getStarCollision(st *star, s *stage) {
+
+	if gr.moving || gr.dying || !gr.exist || st.color != gr.color {
+		return
+	}
+
+	// Check if near a star
+	m := absInt(int(st.x-gr.x)) + absInt(int(st.y-gr.y))
+	if m == 1 {
+		gr.dying = true
+		gr.spr.frame = 0
+		gr.spr.row = 3
+	}
+}
+
 // Draw
 func (gr *gremlin) draw(bmp *bitmap, g *graphics) {
+
+	if !gr.exist {
+		return
+	}
 
 	// Draw sprite
 	gr.spr.draw(g, bmp, int32(gr.vx), int32(gr.vy), flipNone)
@@ -206,6 +265,8 @@ func createGremlin(x, y, color int32) *gremlin {
 	// Set defaults
 	gr.moveTimer = 0.0
 	gr.moving = false
+	gr.exist = true
+	gr.dying = false
 
 	return gr
 }
