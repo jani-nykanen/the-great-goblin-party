@@ -14,17 +14,59 @@ const (
 
 // Stage type
 type stage struct {
-	baseMap      *tilemap
-	width        int32
-	height       int32
-	index        int
-	bmpTestTiles *bitmap
-	bmpFont      *bitmap
-	bmpBorders   *bitmap
-	bmpWall      *bitmap
-	xpos         int32
-	ypos         int32
-	objects      []object
+	baseMap    *tilemap
+	width      int32
+	height     int32
+	index      int
+	bmpFont    *bitmap
+	bmpBorders *bitmap
+	bmpWall    *bitmap
+	bmpGremlin *bitmap
+	xpos       int32
+	ypos       int32
+	gremlins   []*gremlin
+	stars      []*star
+}
+
+// Add a gremlin
+func (s *stage) addGremlin(x, y, color int32) {
+
+	s.gremlins = append(s.gremlins, createGremlin(x, y, color))
+}
+
+// Add a star
+func (s *stage) addStar(x, y, color int32) {
+
+	s.stars = append(s.stars, createStar(x, y, color))
+}
+
+// Parse objects
+func (s *stage) parseObjects() {
+
+	// Go through tiles
+	var tileID int32
+	for y := int32(0); y < s.height; y++ {
+
+		for x := int32(0); x < s.width; x++ {
+
+			// Get tileID
+			tileID = int32(s.baseMap.getTile(x, y))
+			if tileID <= 0 {
+				continue
+			}
+
+			// (We are not using switch here because
+			// it does work as I would like to in Go)
+
+			// If gremlin
+			if tileID >= 2 && tileID <= 4 {
+				s.addGremlin(x, y, tileID-2)
+				// If star
+			} else if tileID >= 4 && tileID <= 6 {
+				s.addStar(x, y, tileID-4)
+			}
+		}
+	}
 }
 
 // Get difficulty string
@@ -49,10 +91,16 @@ func (s *stage) getDifficultyString() string {
 // Update stage
 func (s *stage) update(input *inputManager, tm float32) {
 
-	// Update objects
-	for i := 0; i < len(s.objects); i++ {
+	// Update gremlins
+	for i := 0; i < len(s.gremlins); i++ {
 
-		s.objects[i].update(input, tm)
+		s.gremlins[i].update(input, tm)
+	}
+
+	// Update stars
+	for i := 0; i < len(s.stars); i++ {
+
+		s.stars[i].update(input, tm)
 	}
 }
 
@@ -106,21 +154,11 @@ func (s *stage) drawBorders(g *graphics) {
 		xpos+xjump, ypos+yjump, flipNone)
 }
 
-// Draw map
-func (s *stage) drawMap(g *graphics) {
-
-	// Clear screen
-	g.clearScreen(0, 72, 184)
-
-	// Draw borders
-	s.drawBorders(g)
-
-	// Background
-	g.setGlobalColor(0, 0, 0, 255)
-	g.fillRect(s.xpos, s.ypos, s.width*16, s.height*16)
+// Draw walls
+func (s *stage) drawWalls(g *graphics) {
 
 	// Draw tiles (temp)
-	var tileID, sx, sy int32
+	var tileID int32
 	for y := int32(0); y < s.height; y++ {
 
 		for x := int32(0); x < s.width; x++ {
@@ -131,22 +169,43 @@ func (s *stage) drawMap(g *graphics) {
 				continue
 			}
 
-			tileID--
 			// If wall
-			if tileID == 0 {
+			if tileID == 1 {
 
-				g.drawBitmapRegion(s.bmpWall, 0, 0, 16, 16, int32(s.xpos+x*16), int32(s.ypos+y*16), flipNone)
-
-			} else {
-
-				// Draw tile
-				sx = tileID % 16
-				sy = tileID / 16
-				g.drawBitmapRegion(s.bmpTestTiles, sx*16, sy*16, 16, 16,
-					int32(s.xpos+x*16), int32(s.ypos+y*16), flipNone)
+				g.drawBitmapRegion(s.bmpWall, 0, 0, 16, 16, (x * 16), (y * 16), flipNone)
 			}
 		}
 	}
+}
+
+// Draw objects
+func (s *stage) drawObjects(g *graphics) {
+
+	// Draw gremlins
+	for i := 0; i < len(s.gremlins); i++ {
+
+		s.gremlins[i].draw(s.bmpGremlin, g)
+	}
+
+	// Draw stars
+	for i := 0; i < len(s.stars); i++ {
+
+		s.stars[i].draw(s.bmpGremlin, g)
+	}
+}
+
+// Draw the background
+func (s *stage) drawBackground(g *graphics) {
+
+	// Clear screen
+	g.clearScreen(0, 72, 184)
+
+	// Draw borders
+	s.drawBorders(g)
+
+	// Background
+	g.setGlobalColor(0, 0, 0, 255)
+	g.fillRect(s.xpos, s.ypos, s.width*16, s.height*16)
 
 }
 
@@ -186,22 +245,21 @@ func (s *stage) drawInfo(g *graphics) {
 // Draw stage
 func (s *stage) draw(g *graphics) {
 
-	// Draw map
-	s.drawMap(g)
+	// Draw background
+	s.drawBackground(g)
 
+	// Draw gremlins
+	g.translate(s.xpos, s.ypos)
+
+	// Draw walls
+	s.drawWalls(g)
 	// Draw objects
-	for i := 0; i < len(s.objects); i++ {
+	s.drawObjects(g)
 
-		s.objects[i].draw(g)
-	}
+	g.translate(0, 0)
 
 	// Draw info
 	s.drawInfo(g)
-}
-
-// Add an object
-func (s *stage) addObject(o object) {
-	s.objects = append(s.objects, o)
 }
 
 // Create a new stage
@@ -212,10 +270,10 @@ func createStage(index int, ass *assetPack) *stage {
 	// Load base map
 	s.baseMap = ass.getTilemap(strconv.Itoa(index))
 	// Get assets
-	s.bmpTestTiles = ass.getBitmap("testTiles")
 	s.bmpFont = ass.getBitmap("font")
 	s.bmpBorders = ass.getBitmap("borders")
 	s.bmpWall = ass.getBitmap("wall")
+	s.bmpGremlin = ass.getBitmap("gremlin")
 	// Get data
 	s.width = int32(s.baseMap.width)
 	s.height = int32(s.baseMap.height)
@@ -224,8 +282,11 @@ func createStage(index int, ass *assetPack) *stage {
 	s.xpos = 128 - s.width*16/2
 	s.ypos = stageYOff + (240-stageYOff)/2 - s.height*16/2
 
-	// Create an empty object list
-	s.objects = make([]object, 0)
+	// Create an empty object lists
+	s.gremlins = make([]*gremlin, 0)
+
+	// Parse objects
+	s.parseObjects()
 
 	s.index = index
 

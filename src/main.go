@@ -18,17 +18,17 @@ func main() {
 	bmpPaths := []string{
 		"assets/bitmaps/font.png",
 		"assets/bitmaps/goat.png",
-		"assets/bitmaps/test_tiles.png",
 		"assets/bitmaps/borders.png",
 		"assets/bitmaps/wall.png",
+		"assets/bitmaps/gremlin.png",
 		"",
 	}
 	bmpNames := []string{
 		"font",
 		"goat",
-		"testTiles",
 		"borders",
 		"wall",
+		"gremlin",
 	}
 	mapPaths := []string{
 		"assets/maps/1.tmx",

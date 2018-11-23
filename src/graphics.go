@@ -25,6 +25,7 @@ type graphics struct {
 	globalColor color
 	src         sdl.Rect
 	dst         sdl.Rect
+	tx, ty      int32
 }
 
 // Initialize
@@ -37,8 +38,17 @@ func (g *graphics) init(rend *sdl.Renderer) error {
 	g.globalColor = color{
 		r: 255, g: 255, b: 255, a: 255,
 	}
+	g.tx = 0
+	g.ty = 0
 
 	return nil
+}
+
+// Set translation
+func (g *graphics) translate(x, y int32) {
+
+	g.tx = x
+	g.ty = y
 }
 
 // Clear screen
@@ -71,6 +81,9 @@ func (g *graphics) setGlobalColor(rc, gc, bc, ac uint8) {
 // Draw a bitmap
 func (g *graphics) drawBitmap(bmp *bitmap, dx, dy int32) {
 
+	dx += g.tx
+	dy += g.ty
+
 	g.dst = sdl.Rect{X: dx, Y: dy, W: int32(bmp.width), H: int32(bmp.height)}
 	g.rend.Copy(bmp.texture, nil, &g.dst)
 }
@@ -78,12 +91,18 @@ func (g *graphics) drawBitmap(bmp *bitmap, dx, dy int32) {
 // Draw a scaled bitmap
 func (g *graphics) drawScaledBitmap(bmp *bitmap, dx, dy, dw, dh int32) {
 
+	dx += g.tx
+	dy += g.ty
+
 	g.dst = sdl.Rect{X: dx, Y: dy, W: dw, H: dh}
 	g.rend.Copy(bmp.texture, nil, &g.dst)
 }
 
 // Draw a bitmap region
 func (g *graphics) drawBitmapRegion(bmp *bitmap, sx, sy, sw, sh, dx, dy int32, flip int) {
+
+	dx += g.tx
+	dy += g.ty
 
 	g.src = sdl.Rect{X: sx, Y: sy, W: sw, H: sh}
 	g.dst = sdl.Rect{X: dx, Y: dy, W: sw, H: sh}
@@ -135,6 +154,9 @@ func (g *graphics) drawText(font *bitmap, text string, dx, dy int32, xoff, yoff 
 
 // Draw a filled rectangle
 func (g *graphics) fillRect(dx, dy, dw, dh int32) {
+
+	dx += g.tx
+	dy += g.ty
 
 	c := g.globalColor
 	g.rend.SetDrawColor(c.r, c.g, c.b, c.a)
