@@ -10,14 +10,40 @@ const (
 
 // Gremlin type
 type gremlin struct {
-	x, y      int32
-	tx, ty    int32
-	vx, vy    float32
-	moveTimer float32
-	stopped   bool
-	moving    bool
-	spr       sprite
-	color     int32
+	x, y          int32
+	tx, ty        int32
+	vx, vy        float32
+	moveTimer     float32
+	startedMoving bool
+	collisionSet  bool
+	stopped       bool
+	moving        bool
+	spr           sprite
+	color         int32
+}
+
+// Check collisions
+func (gr *gremlin) checkCollisions(s *stage) {
+
+	// Check other gremlins
+	if gr.moving && s.isTileSolid(int(gr.tx), int(gr.ty)) == 2 {
+
+		// Return to the original position
+		gr.tx = gr.x
+		gr.ty = gr.y
+		gr.moving = false
+		gr.moveTimer = 0.0
+
+		// Update virtual position
+		gr.vx = float32(gr.x) * 16.0
+		gr.vy = float32(gr.y) * 16.0
+
+		gr.spr.row = 0
+
+	} else if gr.moving {
+		// Change animation row
+		gr.spr.row = 1
+	}
 }
 
 // Control
@@ -50,7 +76,7 @@ func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 		// Change animation back
 		if gr.stopped {
 
-			gr.spr.row--
+			gr.spr.row = 0
 			gr.stopped = false
 		}
 
@@ -61,33 +87,26 @@ func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 	gr.tx = gr.x + dx
 	gr.ty = gr.y + dy
 
-	// Check collision
-	if s.isTileSolid(int(gr.tx), int(gr.ty)) {
+	// Check if wall
+	if s.isTileSolid(int(gr.tx), int(gr.ty)) == 1 {
 
 		gr.tx = gr.x
 		gr.ty = gr.y
 
-		// Change animation back
-		if gr.stopped {
+		// Change animation row
+		gr.spr.row = 0
 
-			gr.spr.row--
-			gr.stopped = false
-		}
-
-	} else {
-
-		// Move
-		gr.moveTimer = gremlimMoveTime
-		gr.moving = true
-
-		// Update solid data
-		s.updateSolid(int(gr.x), int(gr.y), false)
-		s.updateSolid(int(gr.tx), int(gr.ty), true)
-
-		if !gr.stopped {
-			gr.spr.row++
-		}
+		return
 	}
+
+	// Move
+	gr.moveTimer = gremlimMoveTime
+	gr.moving = true
+	gr.startedMoving = true
+	gr.collisionSet = false
+
+	// Update solid data
+	s.updateSolid(int(gr.x), int(gr.y), 0)
 }
 
 // Move
@@ -97,7 +116,7 @@ func (gr *gremlin) move(s *stage, tm float32) {
 	if !gr.moving {
 
 		// Update solid data
-		s.updateSolid(int(gr.x), int(gr.y), true)
+		s.updateSolid(int(gr.x), int(gr.y), 2)
 
 		// Update virtual position when
 		// standing
@@ -125,6 +144,10 @@ func (gr *gremlin) move(s *stage, tm float32) {
 		// Set to the new position
 		gr.x = gr.tx
 		gr.y = gr.ty
+
+		// Update solid data
+		s.updateSolid(int(gr.x), int(gr.y), 2)
+
 	}
 
 }
@@ -145,6 +168,8 @@ func (gr *gremlin) animate(tm float32) {
 
 // Update
 func (gr *gremlin) update(input *inputManager, s *stage, tm float32) {
+
+	gr.startedMoving = false
 
 	// Control
 	gr.control(input, s, tm)

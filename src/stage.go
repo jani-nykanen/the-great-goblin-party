@@ -15,7 +15,7 @@ const (
 // Stage type
 type stage struct {
 	baseMap    *tilemap
-	solidMap   []bool
+	solidMap   []int
 	width      int32
 	height     int32
 	index      int
@@ -109,11 +109,16 @@ func (s *stage) update(input *inputManager, tm float32) {
 
 		s.gremlins[i].update(input, s, tm)
 	}
+	// Update gremlin collision
+	for i := 0; i < len(s.gremlins); i++ {
+
+		s.gremlins[i].checkCollisions(s)
+	}
 
 	// Update stars
 	for i := 0; i < len(s.stars); i++ {
 
-		s.stars[i].update(input, tm)
+		s.stars[i].update(input, s, tm)
 	}
 }
 
@@ -276,17 +281,17 @@ func (s *stage) draw(g *graphics) {
 }
 
 // Check solid data
-func (s *stage) isTileSolid(x, y int) bool {
+func (s *stage) isTileSolid(x, y int) int {
 
 	if x < 0 || y < 0 || x >= s.baseMap.width || y >= s.baseMap.height {
-		return true
+		return 1
 	}
 
 	return s.solidMap[y*s.baseMap.width+x]
 }
 
 // Update solid data
-func (s *stage) updateSolid(x, y int, value bool) {
+func (s *stage) updateSolid(x, y int, value int) {
 
 	if x < 0 || y < 0 || x >= s.baseMap.width || y >= s.baseMap.height {
 		return
@@ -303,14 +308,14 @@ func createStage(index int, ass *assetPack) *stage {
 	// Load base map
 	s.baseMap = ass.getTilemap(strconv.Itoa(index))
 	// Create solid map
-	s.solidMap = make([]bool, s.baseMap.width*s.baseMap.height)
+	s.solidMap = make([]int, s.baseMap.width*s.baseMap.height)
 	for i := 0; i < len(s.solidMap); i++ {
 
 		// Check walls
 		if s.baseMap.data[i] == 1 {
-			s.solidMap[i] = true
+			s.solidMap[i] = 1
 		} else {
-			s.solidMap[i] = false
+			s.solidMap[i] = 0
 		}
 	}
 

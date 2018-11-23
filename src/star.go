@@ -12,25 +12,28 @@ type star struct {
 }
 
 // Animate
-func (s *star) animate(tm float32) {
+func (st *star) animate(tm float32) {
 
 	animSpeed := float32(8.0)
 
-	s.spr.animate(2, 0, 3, animSpeed, tm)
+	st.spr.animate(2, 0, 3, animSpeed, tm)
 }
 
 // Update
-func (s *star) update(input *inputManager, tm float32) {
+func (st *star) update(input *inputManager, s *stage, tm float32) {
+
+	// Update solid
+	s.updateSolid(int(st.x), int(st.y), 2)
 
 	// Animate
-	s.animate(tm)
+	st.animate(tm)
 }
 
 // Draw
-func (s *star) draw(bmp *bitmap, g *graphics) {
+func (st *star) draw(bmp *bitmap, g *graphics) {
 
 	// Draw sprite
-	s.spr.draw(g, bmp, int32(s.x)*16, int32(s.y)*16, flipNone)
+	st.spr.draw(g, bmp, int32(st.x)*16, int32(st.y)*16, flipNone)
 }
 
 // Create a star
