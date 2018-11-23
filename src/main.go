@@ -48,7 +48,7 @@ func main() {
 
 	// Create default configuration
 	conf := config{
-		caption:      "Super Yet Another Puzzle Game 3000",
+		caption:      "The Great Gremlin Party",
 		winWidth:     512,
 		winHeight:    480,
 		canvasWidth:  256,

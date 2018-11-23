@@ -15,6 +15,7 @@ const (
 // Stage type
 type stage struct {
 	baseMap    *tilemap
+	solidMap   []bool
 	width      int32
 	height     int32
 	index      int
@@ -26,6 +27,7 @@ type stage struct {
 	ypos       int32
 	gremlins   []*gremlin
 	stars      []*star
+	anyMoving  bool
 }
 
 // Add a gremlin
@@ -91,10 +93,21 @@ func (s *stage) getDifficultyString() string {
 // Update stage
 func (s *stage) update(input *inputManager, tm float32) {
 
+	// Check if something is moving
+	s.anyMoving = false
+	for i := 0; i < len(s.gremlins); i++ {
+
+		if s.gremlins[i].moving {
+
+			s.anyMoving = true
+			break
+		}
+	}
+
 	// Update gremlins
 	for i := 0; i < len(s.gremlins); i++ {
 
-		s.gremlins[i].update(input, tm)
+		s.gremlins[i].update(input, s, tm)
 	}
 
 	// Update stars
@@ -262,6 +275,26 @@ func (s *stage) draw(g *graphics) {
 	s.drawInfo(g)
 }
 
+// Check solid data
+func (s *stage) isTileSolid(x, y int) bool {
+
+	if x < 0 || y < 0 || x >= s.baseMap.width || y >= s.baseMap.height {
+		return true
+	}
+
+	return s.solidMap[y*s.baseMap.width+x]
+}
+
+// Update solid data
+func (s *stage) updateSolid(x, y int, value bool) {
+
+	if x < 0 || y < 0 || x >= s.baseMap.width || y >= s.baseMap.height {
+		return
+	}
+
+	s.solidMap[y*s.baseMap.width+x] = value
+}
+
 // Create a new stage
 func createStage(index int, ass *assetPack) *stage {
 
@@ -269,6 +302,18 @@ func createStage(index int, ass *assetPack) *stage {
 
 	// Load base map
 	s.baseMap = ass.getTilemap(strconv.Itoa(index))
+	// Create solid map
+	s.solidMap = make([]bool, s.baseMap.width*s.baseMap.height)
+	for i := 0; i < len(s.solidMap); i++ {
+
+		// Check walls
+		if s.baseMap.data[i] == 1 {
+			s.solidMap[i] = true
+		} else {
+			s.solidMap[i] = false
+		}
+	}
+
 	// Get assets
 	s.bmpFont = ass.getBitmap("font")
 	s.bmpBorders = ass.getBitmap("borders")
