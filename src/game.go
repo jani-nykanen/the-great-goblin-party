@@ -31,6 +31,12 @@ func (t *game) init(g *graphics, ass *assetPack) error {
 // Update
 func (t *game) update(input *inputManager, tm float32) {
 
+	// Reset
+	if input.getButton("restart") == stateDown {
+		t.reset(t.gameStage.index)
+		return
+	}
+
 	// Update stage
 	t.gameStage.update(input, tm)
 }
