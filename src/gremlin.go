@@ -23,6 +23,7 @@ type gremlin struct {
 	exist         bool
 	dying         bool
 	sleeping      bool
+	startRow      int32
 }
 
 // Find a free tile
@@ -79,7 +80,7 @@ func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 		// Change animation back
 		if gr.stopped {
 
-			gr.spr.row = 0
+			gr.spr.row = gr.startRow
 			gr.stopped = false
 		}
 
@@ -97,7 +98,7 @@ func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 		gr.ty = gr.y
 
 		// Change animation row
-		gr.spr.row = 0
+		gr.spr.row = gr.startRow
 
 		return
 	}
@@ -107,7 +108,7 @@ func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 	gr.moving = true
 	gr.startedMoving = true
 	gr.collisionSet = false
-	gr.spr.row = 1
+	gr.spr.row = gr.startRow + 1
 
 	// Update solid data
 	s.updateSolid(int(gr.x), int(gr.y), 0)
@@ -119,9 +120,6 @@ func (gr *gremlin) move(s *stage, tm float32) {
 
 	// If not moving
 	if !gr.moving {
-
-		// Update solid data
-		// s.updateSolid(int(gr.x), int(gr.y), 2)
 
 		// Update virtual position when
 		// standing
@@ -181,7 +179,7 @@ func (gr *gremlin) die(s *stage, tm float32) {
 	gr.vy = float32(gr.y) * 16.0
 
 	// Animate
-	gr.spr.animate(3, 0, 4, animSpeed, tm)
+	gr.spr.animate(gr.startRow+3, 0, 4, animSpeed, tm)
 	if gr.spr.frame == 4 {
 		gr.exist = false
 		s.addStar(gr.x, gr.y, gr.color)
@@ -194,7 +192,7 @@ func (gr *gremlin) sleep(s *stage, tm float32) {
 	sleepSpeed := float32(60.0)
 
 	// Animate
-	gr.spr.animate(4, 0, 3, sleepSpeed, tm)
+	gr.spr.animate(gr.startRow+4, 0, 3, sleepSpeed, tm)
 
 	// Set solid
 	s.updateSolid(int(gr.x), int(gr.y), 1)
@@ -272,7 +270,11 @@ func createGremlin(x, y, color int32, s *stage, sleeping bool) *gremlin {
 	gr.y = y
 	gr.vx = float32(x) * 16.0
 	gr.vy = float32(y) * 16.0
-	s.updateSolid(int(x), int(y), 2)
+	solid := 2
+	if sleeping {
+		solid = 1
+	}
+	s.updateSolid(int(x), int(y), solid)
 	// Is sleeping
 	gr.sleeping = sleeping
 
@@ -285,6 +287,7 @@ func createGremlin(x, y, color int32, s *stage, sleeping bool) *gremlin {
 
 	// Set color
 	gr.color = color
+	gr.startRow = color * 5
 
 	// Set defaults
 	gr.moveTimer = 0.0

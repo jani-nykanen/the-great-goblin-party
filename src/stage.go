@@ -42,7 +42,7 @@ func (s *stage) addGremlin(x, y, color int32, sleeping bool) {
 // Add a star
 func (s *stage) addStar(x, y, color int32) {
 
-	s.stars = append(s.stars, createStar(x, y, color))
+	s.stars = append(s.stars, createStar(x, y, color, s))
 }
 
 // Parse objects

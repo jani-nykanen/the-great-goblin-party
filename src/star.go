@@ -16,7 +16,7 @@ func (st *star) animate(tm float32) {
 
 	animSpeed := float32(8.0)
 
-	st.spr.animate(2, 0, 3, animSpeed, tm)
+	st.spr.animate(st.color*5+2, 0, 3, animSpeed, tm)
 }
 
 // Update
@@ -37,20 +37,22 @@ func (st *star) draw(bmp *bitmap, g *graphics) {
 }
 
 // Create a star
-func createStar(x, y, color int32) *star {
+func createStar(x, y, color int32, s *stage) *star {
 
-	s := new(star)
+	st := new(star)
 
 	// Set position
-	s.x = x
-	s.y = y
+	st.x = x
+	st.y = y
+	// Update solid
+	s.updateSolid(int(st.x), int(st.y), 1)
 
 	// Create sprite
-	s.spr = createSprite(16, 16)
-	s.spr.row = color*5 + 2
+	st.spr = createSprite(16, 16)
+	st.spr.row = color*5 + 2
 
 	// Set color
-	s.color = color
+	st.color = color
 
-	return s
+	return st
 }
