@@ -25,6 +25,30 @@ type gremlin struct {
 	sleeping      bool
 }
 
+// Find a free tile
+func (gr *gremlin) findFreeTile(dx, dy int32, s *stage) bool {
+
+	x := gr.x
+	y := gr.y
+	var tileID int
+
+	for {
+
+		x += dx
+		y += dy
+
+		tileID = s.isTileSolid(int(x), int(y))
+		if tileID == 0 {
+			return true
+
+		} else if tileID == 1 {
+			break
+		}
+	}
+
+	return false
+}
+
 // Control
 func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 
@@ -67,7 +91,7 @@ func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 	gr.ty = gr.y + dy
 
 	// Check if free
-	if s.isTileSolid(int(gr.tx), int(gr.ty)) != 0 {
+	if !gr.findFreeTile(dx, dy, s) {
 
 		gr.tx = gr.x
 		gr.ty = gr.y
@@ -87,7 +111,7 @@ func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 
 	// Update solid data
 	s.updateSolid(int(gr.x), int(gr.y), 0)
-	s.updateSolid(int(gr.tx), int(gr.ty), 2)
+	// s.updateSolid(int(gr.tx), int(gr.ty), 2)
 }
 
 // Move
