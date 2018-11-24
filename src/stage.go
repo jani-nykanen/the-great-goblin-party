@@ -77,7 +77,7 @@ func (s *stage) parseObjects() {
 
 				// If boulder
 			} else if tileID == 11 {
-				s.addGremlin(x, y, 4, false)
+				s.addGremlin(x, y, 3, false)
 
 			}
 		}
@@ -138,7 +138,7 @@ func (s *stage) update(input *inputManager, tm float32) {
 		s.moves--
 		// If negative moves, restart
 		if s.moves < 0 {
-			s.gameRef.reset(s.index)
+			s.gameRef.readyReset()
 			return
 		}
 	}

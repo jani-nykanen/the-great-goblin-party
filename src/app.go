@@ -22,6 +22,7 @@ type application struct {
 	canvas       *bitmap
 	canvasPos    sdl.Rect
 	assets       *assetPack
+	trans        *transition
 }
 
 // Initialize SDL2 content
@@ -98,6 +99,9 @@ func (app *application) init(conf config) error {
 	if err != nil {
 		return err
 	}
+
+	// Create transition
+	app.trans = createTransition()
 
 	// Create a slice for scenes
 	app.scenes = make([]scene, 0)
@@ -268,11 +272,19 @@ func (app *application) update(delta float32) {
 
 	tm := delta / 1000.0 / (1.0 / 60.0)
 
+	// Update transition
+	if app.trans.active {
+
+		app.trans.update(tm)
+		return
+	}
+
 	// Update the current scene
 	if app.currentScene != nil {
 
 		(*app.currentScene).update(app.input, tm)
 	}
+
 }
 
 // Draw to canvas
@@ -285,6 +297,9 @@ func (app *application) drawToCanvas() {
 
 		(*app.currentScene).draw(app.g)
 	}
+
+	// Draw transition
+	app.trans.draw(app.g, int32(app.canvas.width), int32(app.canvas.height))
 
 	app.g.setRenderTarget(nil)
 }
@@ -317,7 +332,7 @@ func (app *application) run() error {
 	for i := 0; i < len(app.scenes); i++ {
 
 		s = app.scenes[i]
-		err = s.init(app.g, app.assets)
+		err = s.init(app.g, app.trans, app.assets)
 		if err != nil {
 
 			return err

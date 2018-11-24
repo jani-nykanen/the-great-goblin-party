@@ -7,6 +7,7 @@ package main
 type game struct {
 	ass       *assetPack
 	gameStage *stage
+	trans     *transition
 }
 
 // Reset
@@ -16,11 +17,26 @@ func (t *game) reset(sIndex int) {
 	t.gameStage = createStage(sIndex, t.ass, t)
 }
 
-// Initialize
-func (t *game) init(g *graphics, ass *assetPack) error {
+// "Ready reset"
+func (t *game) readyReset() {
 
-	// Store assets for future use
+	// Set transition callback
+	fn := func() {
+		t.reset(t.gameStage.index)
+	}
+	// Activate transition
+	t.trans.activate(fadeIn, 2.0, fn)
+}
+
+// Initialize
+func (t *game) init(g *graphics, trans *transition, ass *assetPack) error {
+
+	// Store references for future use
 	t.ass = ass
+	t.trans = trans
+
+	// Fade out
+	t.trans.activate(fadeOut, 2.0, nil)
 
 	// Start with stage 1
 	t.reset(1)
@@ -32,8 +48,9 @@ func (t *game) init(g *graphics, ass *assetPack) error {
 func (t *game) update(input *inputManager, tm float32) {
 
 	// Reset
-	if input.getButton("restart") == stateDown {
-		t.reset(t.gameStage.index)
+	if input.getButton("restart") == statePressed {
+		// t.reset(t.gameStage.index)
+		t.readyReset()
 		return
 	}
 
