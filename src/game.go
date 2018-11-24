@@ -8,6 +8,7 @@ type game struct {
 	ass         *assetPack
 	gameStage   *stage
 	trans       *transition
+	evMan       *eventManager
 	pauseScreen *pause
 	info        *infoBox
 }
@@ -37,7 +38,7 @@ func (t *game) showInfoBox(victory bool) {
 		t.readyReset()
 	}
 	fn2 := func() {
-		panic("Not yet implemented!")
+		t.quit()
 	}
 
 	if victory {
@@ -48,12 +49,24 @@ func (t *game) showInfoBox(victory bool) {
 	}
 }
 
+// Quit
+func (t *game) quit() {
+
+	// Set transition callback
+	fn := func() {
+		t.evMan.terminate()
+	}
+	// Activate transition
+	t.trans.activate(fadeIn, 2.0, fn)
+}
+
 // Initialize
-func (t *game) init(g *graphics, trans *transition, ass *assetPack) error {
+func (t *game) init(g *graphics, trans *transition, evMan *eventManager, ass *assetPack) error {
 
 	// Store references for future use
 	t.ass = ass
 	t.trans = trans
+	t.evMan = evMan
 
 	// Create pause screen
 	t.pauseScreen = createPause(t, ass)

@@ -23,6 +23,7 @@ type application struct {
 	canvasPos    sdl.Rect
 	assets       *assetPack
 	trans        *transition
+	evMan        *eventManager
 }
 
 // Initialize SDL2 content
@@ -102,6 +103,8 @@ func (app *application) init(conf config) error {
 
 	// Create transition
 	app.trans = createTransition()
+	// Create event manager
+	app.evMan = createEventManager(app)
 
 	// Create a slice for scenes
 	app.scenes = make([]scene, 0)
@@ -323,6 +326,12 @@ func (app *application) destroy() {
 	app.window.Destroy()
 }
 
+// Terminate
+func (app *application) terminate() {
+
+	app.running = false
+}
+
 // Run
 func (app *application) run() error {
 
@@ -332,7 +341,7 @@ func (app *application) run() error {
 	for i := 0; i < len(app.scenes); i++ {
 
 		s = app.scenes[i]
-		err = s.init(app.g, app.trans, app.assets)
+		err = s.init(app.g, app.trans, app.evMan, app.assets)
 		if err != nil {
 
 			return err

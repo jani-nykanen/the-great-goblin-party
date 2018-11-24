@@ -80,7 +80,7 @@ func createPause(gameRef *game, ass *assetPack) *pause {
 		p.gameRef.readyReset()
 	}
 	cbs[2] = func() {
-		panic("Not yet implemented!")
+		p.gameRef.quit()
 	}
 	p.pauseMenu = createMenu(str, cbs)
 
