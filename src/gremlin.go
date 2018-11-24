@@ -161,6 +161,16 @@ func (gr *gremlin) animate(tm float32) {
 	standSpeed := float32(10.0)
 	moveSpeed := float32(8.0)
 
+	// If boulder
+	if gr.color == 4 {
+		gr.spr.row = 3 * 5
+		gr.spr.frame = 0
+		if gr.moving {
+			gr.spr.frame = 1
+		}
+		return
+	}
+
 	speed := standSpeed
 	if gr.moving {
 		speed = moveSpeed
@@ -236,7 +246,7 @@ func (gr *gremlin) update(input *inputManager, s *stage, tm float32) {
 // Check star collision
 func (gr *gremlin) getStarCollision(st *star, s *stage) {
 
-	if gr.moving || gr.dying || !gr.exist || st.color != gr.color {
+	if gr.color == 4 || gr.moving || gr.dying || !gr.exist || st.color != gr.color {
 		return
 	}
 

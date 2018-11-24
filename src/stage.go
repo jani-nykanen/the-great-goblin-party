@@ -74,6 +74,11 @@ func (s *stage) parseObjects() {
 				// If sleeping
 			} else if tileID >= 8 && tileID <= 10 {
 				s.addGremlin(x, y, tileID-8, true)
+
+				// If boulder
+			} else if tileID == 11 {
+				s.addGremlin(x, y, 4, false)
+
 			}
 		}
 	}
