@@ -25,43 +25,11 @@ type gremlin struct {
 	sleeping      bool
 }
 
-// Check collisions
-func (gr *gremlin) checkCollisions(s *stage) bool {
-
-	if !gr.exist {
-		return false
-	}
-
-	// Check other gremlins
-	if gr.moving && s.isTileSolid(int(gr.tx), int(gr.ty)) == 2 {
-
-		// Return to the original position
-		gr.tx = gr.x
-		gr.ty = gr.y
-		gr.moving = false
-		gr.moveTimer = 0.0
-
-		// Update virtual position
-		gr.vx = float32(gr.x) * 16.0
-		gr.vy = float32(gr.y) * 16.0
-
-		gr.spr.row = 0
-
-		return true
-
-	} else if gr.moving {
-		// Change animation row
-		gr.spr.row = 1
-	}
-
-	return false
-}
-
 // Control
 func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 
 	// If something moving, do not control
-	if s.moveCount > 0 {
+	if s.anyMoving {
 		return
 	}
 
@@ -98,8 +66,8 @@ func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 	gr.tx = gr.x + dx
 	gr.ty = gr.y + dy
 
-	// Check if wall
-	if s.isTileSolid(int(gr.tx), int(gr.ty)) == 1 {
+	// Check if free
+	if s.isTileSolid(int(gr.tx), int(gr.ty)) != 0 {
 
 		gr.tx = gr.x
 		gr.ty = gr.y
@@ -115,9 +83,11 @@ func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 	gr.moving = true
 	gr.startedMoving = true
 	gr.collisionSet = false
+	gr.spr.row = 1
 
 	// Update solid data
 	s.updateSolid(int(gr.x), int(gr.y), 0)
+	s.updateSolid(int(gr.tx), int(gr.ty), 2)
 }
 
 // Move
@@ -127,7 +97,7 @@ func (gr *gremlin) move(s *stage, tm float32) {
 	if !gr.moving {
 
 		// Update solid data
-		s.updateSolid(int(gr.x), int(gr.y), 2)
+		// s.updateSolid(int(gr.x), int(gr.y), 2)
 
 		// Update virtual position when
 		// standing
@@ -269,7 +239,7 @@ func (gr *gremlin) draw(bmp *bitmap, g *graphics) {
 }
 
 // Create a gremlin
-func createGremlin(x, y, color int32, sleeping bool) *gremlin {
+func createGremlin(x, y, color int32, s *stage, sleeping bool) *gremlin {
 
 	gr := new(gremlin)
 
@@ -278,6 +248,7 @@ func createGremlin(x, y, color int32, sleeping bool) *gremlin {
 	gr.y = y
 	gr.vx = float32(x) * 16.0
 	gr.vy = float32(y) * 16.0
+	s.updateSolid(int(x), int(y), 2)
 	// Is sleeping
 	gr.sleeping = sleeping
 

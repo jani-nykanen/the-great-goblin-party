@@ -28,7 +28,6 @@ type stage struct {
 	gremlins       []*gremlin
 	stars          []*star
 	anyMoving      bool
-	moveCount      int
 	oldMovingState bool
 	moves          int
 	gameRef        *game
@@ -37,7 +36,7 @@ type stage struct {
 // Add a gremlin
 func (s *stage) addGremlin(x, y, color int32, sleeping bool) {
 
-	s.gremlins = append(s.gremlins, createGremlin(x, y, color, sleeping))
+	s.gremlins = append(s.gremlins, createGremlin(x, y, color, s, sleeping))
 }
 
 // Add a star
@@ -106,7 +105,6 @@ func (s *stage) update(input *inputManager, tm float32) {
 	// and check star collisions
 	s.oldMovingState = s.anyMoving
 	s.anyMoving = false
-	s.moveCount = 0
 	for i := 0; i < len(s.gremlins); i++ {
 
 		// Check stars collisions before updating
@@ -119,7 +117,7 @@ func (s *stage) update(input *inputManager, tm float32) {
 		// Check if active
 		if !s.anyMoving && s.gremlins[i].isActive() {
 
-			s.moveCount++
+			s.anyMoving = true
 		}
 	}
 
@@ -128,18 +126,8 @@ func (s *stage) update(input *inputManager, tm float32) {
 
 		s.gremlins[i].update(input, s, tm)
 	}
-	// Update gremlin collision
-	for i := 0; i < len(s.gremlins); i++ {
-
-		if s.gremlins[i].checkCollisions(s) {
-			s.moveCount--
-		}
-	}
 
 	// If something moved, reduce moves
-	if s.moveCount > 0 {
-		s.anyMoving = true
-	}
 	if s.oldMovingState != s.anyMoving && s.anyMoving {
 
 		s.moves--
