@@ -44,7 +44,7 @@ func main() {
 	kconf.addButton("left", sdl.SCANCODE_LEFT)
 	kconf.addButton("down", sdl.SCANCODE_DOWN)
 	kconf.addButton("start", sdl.SCANCODE_RETURN)
-	kconf.addButton("back", sdl.SCANCODE_ESCAPE)
+	kconf.addButton("cancel", sdl.SCANCODE_ESCAPE)
 	kconf.addButton("restart", sdl.SCANCODE_R)
 
 	// Create default configuration

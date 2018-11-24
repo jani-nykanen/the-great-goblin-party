@@ -110,7 +110,13 @@ func (s *stage) update(input *inputManager, tm float32) {
 	// and check star collisions
 	s.oldMovingState = s.anyMoving
 	s.anyMoving = false
+	gremlinCount := 0
 	for i := 0; i < len(s.gremlins); i++ {
+
+		// Count existing gremlins
+		if s.gremlins[i].exist && s.gremlins[i].color != 3 {
+			gremlinCount++
+		}
 
 		// Check stars collisions before updating
 		// the gremlin itself
@@ -126,6 +132,13 @@ func (s *stage) update(input *inputManager, tm float32) {
 		}
 	}
 
+	// If no gremlins left, victory
+	if gremlinCount == 0 {
+
+		s.gameRef.showInfoBox(true)
+		return
+	}
+
 	// Update gremlins
 	for i := 0; i < len(s.gremlins); i++ {
 
@@ -138,7 +151,7 @@ func (s *stage) update(input *inputManager, tm float32) {
 		s.moves--
 		// If negative moves, restart
 		if s.moves < 0 {
-			s.gameRef.readyReset()
+			s.gameRef.showInfoBox(false)
 			return
 		}
 	}

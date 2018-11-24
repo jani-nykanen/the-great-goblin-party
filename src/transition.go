@@ -9,9 +9,6 @@ const (
 	fadeTime = 60
 )
 
-// Callback function type
-type cbfun func()
-
 // Transition type
 type transition struct {
 	timer  float32
