@@ -22,13 +22,14 @@ type gremlin struct {
 	color         int32
 	exist         bool
 	dying         bool
+	sleeping      bool
 }
 
 // Check collisions
-func (gr *gremlin) checkCollisions(s *stage) {
+func (gr *gremlin) checkCollisions(s *stage) bool {
 
 	if !gr.exist {
-		return
+		return false
 	}
 
 	// Check other gremlins
@@ -46,17 +47,21 @@ func (gr *gremlin) checkCollisions(s *stage) {
 
 		gr.spr.row = 0
 
+		return true
+
 	} else if gr.moving {
 		// Change animation row
 		gr.spr.row = 1
 	}
+
+	return false
 }
 
 // Control
 func (gr *gremlin) control(input *inputManager, s *stage, tm float32) {
 
 	// If something moving, do not control
-	if s.anyMoving {
+	if s.moveCount > 0 {
 		return
 	}
 
@@ -173,7 +178,7 @@ func (gr *gremlin) animate(tm float32) {
 }
 
 // Die
-func (gr *gremlin) die(tm float32, s *stage) {
+func (gr *gremlin) die(s *stage, tm float32) {
 
 	animSpeed := float32(8)
 
@@ -187,6 +192,18 @@ func (gr *gremlin) die(tm float32, s *stage) {
 		gr.exist = false
 		s.addStar(gr.x, gr.y, gr.color)
 	}
+}
+
+// Sleep
+func (gr *gremlin) sleep(s *stage, tm float32) {
+
+	sleepSpeed := float32(60.0)
+
+	// Animate
+	gr.spr.animate(4, 0, 3, sleepSpeed, tm)
+
+	// Set solid
+	s.updateSolid(int(gr.x), int(gr.y), 1)
 }
 
 // Is active
@@ -206,7 +223,13 @@ func (gr *gremlin) update(input *inputManager, s *stage, tm float32) {
 
 	// Die
 	if gr.dying {
-		gr.die(tm, s)
+		gr.die(s, tm)
+		return
+	}
+
+	// Sleep
+	if gr.sleeping {
+		gr.sleep(s, tm)
 		return
 	}
 
@@ -246,7 +269,7 @@ func (gr *gremlin) draw(bmp *bitmap, g *graphics) {
 }
 
 // Create a gremlin
-func createGremlin(x, y, color int32) *gremlin {
+func createGremlin(x, y, color int32, sleeping bool) *gremlin {
 
 	gr := new(gremlin)
 
@@ -255,9 +278,15 @@ func createGremlin(x, y, color int32) *gremlin {
 	gr.y = y
 	gr.vx = float32(x) * 16.0
 	gr.vy = float32(y) * 16.0
+	// Is sleeping
+	gr.sleeping = sleeping
 
 	// Create sprite
 	gr.spr = createSprite(16, 16)
+	gr.spr.row = color * 5
+	if sleeping {
+		gr.spr.row += 4
+	}
 
 	// Set color
 	gr.color = color

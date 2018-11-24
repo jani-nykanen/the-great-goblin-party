@@ -14,26 +14,30 @@ const (
 
 // Stage type
 type stage struct {
-	baseMap    *tilemap
-	solidMap   []int
-	width      int32
-	height     int32
-	index      int
-	bmpFont    *bitmap
-	bmpBorders *bitmap
-	bmpWall    *bitmap
-	bmpGremlin *bitmap
-	xpos       int32
-	ypos       int32
-	gremlins   []*gremlin
-	stars      []*star
-	anyMoving  bool
+	baseMap        *tilemap
+	solidMap       []int
+	width          int32
+	height         int32
+	index          int
+	bmpFont        *bitmap
+	bmpBorders     *bitmap
+	bmpWall        *bitmap
+	bmpGremlin     *bitmap
+	xpos           int32
+	ypos           int32
+	gremlins       []*gremlin
+	stars          []*star
+	anyMoving      bool
+	moveCount      int
+	oldMovingState bool
+	moves          int
+	gameRef        *game
 }
 
 // Add a gremlin
-func (s *stage) addGremlin(x, y, color int32) {
+func (s *stage) addGremlin(x, y, color int32, sleeping bool) {
 
-	s.gremlins = append(s.gremlins, createGremlin(x, y, color))
+	s.gremlins = append(s.gremlins, createGremlin(x, y, color, sleeping))
 }
 
 // Add a star
@@ -62,10 +66,15 @@ func (s *stage) parseObjects() {
 
 			// If gremlin
 			if tileID >= 2 && tileID <= 4 {
-				s.addGremlin(x, y, tileID-2)
+				s.addGremlin(x, y, tileID-2, false)
+
 				// If star
 			} else if tileID >= 5 && tileID <= 7 {
 				s.addStar(x, y, tileID-5)
+
+				// If sleeping
+			} else if tileID >= 8 && tileID <= 10 {
+				s.addGremlin(x, y, tileID-8, true)
 			}
 		}
 	}
@@ -95,7 +104,9 @@ func (s *stage) update(input *inputManager, tm float32) {
 
 	// Check if something is moving
 	// and check star collisions
+	s.oldMovingState = s.anyMoving
 	s.anyMoving = false
+	s.moveCount = 0
 	for i := 0; i < len(s.gremlins); i++ {
 
 		// Check stars collisions before updating
@@ -108,7 +119,7 @@ func (s *stage) update(input *inputManager, tm float32) {
 		// Check if active
 		if !s.anyMoving && s.gremlins[i].isActive() {
 
-			s.anyMoving = true
+			s.moveCount++
 		}
 	}
 
@@ -120,7 +131,23 @@ func (s *stage) update(input *inputManager, tm float32) {
 	// Update gremlin collision
 	for i := 0; i < len(s.gremlins); i++ {
 
-		s.gremlins[i].checkCollisions(s)
+		if s.gremlins[i].checkCollisions(s) {
+			s.moveCount--
+		}
+	}
+
+	// If something moved, reduce moves
+	if s.moveCount > 0 {
+		s.anyMoving = true
+	}
+	if s.oldMovingState != s.anyMoving && s.anyMoving {
+
+		s.moves--
+		// If negative moves, restart
+		if s.moves < 0 {
+			s.gameRef.reset(s.index)
+			return
+		}
 	}
 
 	// Update stars
@@ -140,7 +167,7 @@ func (s *stage) drawBorders(g *graphics) {
 	shadowJump := int32(12)
 
 	// "Shadow"
-	g.setGlobalColor(0, 8, 120, 255)
+	g.setGlobalColor(0, 72, 184, 255)
 	g.fillRect(xpos+shadowJump, ypos+shadowJump, xjump+8+2, yjump+8+2)
 
 	// Draw white outline
@@ -224,7 +251,7 @@ func (s *stage) drawObjects(g *graphics) {
 func (s *stage) drawBackground(g *graphics) {
 
 	// Clear screen
-	g.clearScreen(0, 72, 184)
+	g.clearScreen(30, 160, 248)
 
 	// Draw borders
 	s.drawBorders(g)
@@ -262,7 +289,7 @@ func (s *stage) drawInfo(g *graphics) {
 		bottomXOff+int32(len(str)*10)+difMinusX, 240-bottomY, starXoff, 0, false)
 
 	// Draw moves
-	str = "Moves: " + strconv.Itoa(s.baseMap.moveLimit)
+	str = "Moves: " + strconv.Itoa(s.moves)
 	g.drawText(s.bmpFont, str,
 		256-int32(len(str)+1)*10+bottomXOff,
 		240-bottomY, xoff, 0, false)
@@ -309,7 +336,7 @@ func (s *stage) updateSolid(x, y int, value int) {
 }
 
 // Create a new stage
-func createStage(index int, ass *assetPack) *stage {
+func createStage(index int, ass *assetPack, gameRef *game) *stage {
 
 	s := new(stage)
 
@@ -335,18 +362,23 @@ func createStage(index int, ass *assetPack) *stage {
 	// Get data
 	s.width = int32(s.baseMap.width)
 	s.height = int32(s.baseMap.height)
+	s.moves = s.baseMap.moveLimit
 
 	// Calculate position
 	s.xpos = 128 - s.width*16/2
 	s.ypos = stageYOff + (240-stageYOff)/2 - s.height*16/2
+
+	// Set misc variables to default
+	s.anyMoving = false
+	s.oldMovingState = false
+	s.index = index
+	s.gameRef = gameRef
 
 	// Create an empty object lists
 	s.gremlins = make([]*gremlin, 0)
 
 	// Parse objects
 	s.parseObjects()
-
-	s.index = index
 
 	return s
 }

@@ -47,6 +47,7 @@ func createStar(x, y, color int32) *star {
 
 	// Create sprite
 	s.spr = createSprite(16, 16)
+	s.spr.row = color*5 + 2
 
 	// Set color
 	s.color = color

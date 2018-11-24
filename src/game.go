@@ -13,7 +13,7 @@ type game struct {
 func (t *game) reset(sIndex int) {
 
 	// Create game stage
-	t.gameStage = createStage(sIndex, t.ass)
+	t.gameStage = createStage(sIndex, t.ass, t)
 }
 
 // Initialize
