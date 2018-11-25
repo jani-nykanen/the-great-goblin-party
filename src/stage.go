@@ -84,25 +84,6 @@ func (s *stage) parseObjects() {
 	}
 }
 
-// Get difficulty string
-func (s *stage) getDifficultyString() string {
-
-	dif := s.baseMap.difficulty
-	ret := ""
-
-	// Full stars
-	for i := 0; i < int(dif/2); i++ {
-		ret += "#"
-	}
-
-	// Half stars
-	if dif%2 == 1 {
-		ret += "$"
-	}
-
-	return ret
-}
-
 // Update stage
 func (s *stage) update(input *inputManager, tm float32) {
 
@@ -291,7 +272,7 @@ func (s *stage) drawInfo(g *graphics) {
 	g.drawText(s.bmpFont, "Difficulty: ",
 		bottomXOff, 240-bottomY, xoff, 0, false)
 	// Draw difficulty
-	g.drawText(s.bmpFont, s.getDifficultyString(),
+	g.drawText(s.bmpFont, getDifficultyString(s.baseMap.difficulty),
 		bottomXOff+int32(len(str)*10)+difMinusX, 240-bottomY, starXoff, 0, false)
 
 	// Draw moves

@@ -20,6 +20,7 @@ type stageMenu struct {
 	bmpFont    *bitmap
 	bmpButton  *bitmap
 	bmpNumbers *bitmap
+	maps       [12]*tilemap
 	trans      *transition
 	evMan      *eventManager
 	buttons    [12]stageButton
@@ -39,10 +40,16 @@ func (sm *stageMenu) init(g *graphics, trans *transition, evMan *eventManager, a
 	sm.trans = trans
 	sm.evMan = evMan
 
-	// Get assets
+	// Get bitmaps
 	sm.bmpFont = ass.getBitmap("font")
 	sm.bmpNumbers = ass.getBitmap("numbers")
 	sm.bmpButton = ass.getBitmap("button")
+
+	// Get tilemaps
+	for i := 0; i < 12; i++ {
+
+		sm.maps[i] = ass.getTilemap(strconv.Itoa(i + 1))
+	}
 
 	// Set buttons
 	var i int
@@ -64,10 +71,8 @@ func (sm *stageMenu) init(g *graphics, trans *transition, evMan *eventManager, a
 	return nil
 }
 
-// Update
-func (sm *stageMenu) update(input *inputManager, tm float32) {
-
-	flickerSpeed := float32(15.0)
+// Update cursor
+func (sm *stageMenu) updateCursor(input *inputManager) {
 
 	// Update cursor
 	if input.getButton("left") == statePressed {
@@ -92,9 +97,15 @@ func (sm *stageMenu) update(input *inputManager, tm float32) {
 	}
 	sm.cy %= 3
 	sm.cx %= 4
+}
 
-	// Set flickering
-	old := sm.cursor
+// Update
+func (sm *stageMenu) update(input *inputManager, tm float32) {
+
+	// Update cursor
+	sm.updateCursor(input)
+
+	// Set sprite frames
 	sm.cursor = sm.cy*4 + sm.cx
 	var b *stageButton
 	for i := 0; i < len(sm.buttons); i++ {
@@ -102,27 +113,62 @@ func (sm *stageMenu) update(input *inputManager, tm float32) {
 		b = &sm.buttons[i]
 		// Animate
 		if i == sm.cursor {
-
-			b.spr.animate(0, 0, 1, flickerSpeed, tm)
-			if old != sm.cursor {
-				b.spr.frame = 1
-				b.spr.count = 0.0
-			}
+			b.spr.frame = 1
 
 		} else {
-
 			b.spr.frame = 0
 		}
 	}
 
 	// Check button press
-	if input.getButton("start") == statePressed {
+	if input.getButton("start") == statePressed &&
+		sm.maps[sm.cursor] != nil {
 
 		fn := func() {
 			sm.evMan.changeScene(sm.cursor+1, "game")
 		}
 		sm.trans.activate(fadeIn, 2, fn)
 	}
+
+	// Check escape button
+	if input.getButton("cancel") == statePressed {
+
+		fn := func() {
+			sm.evMan.terminate()
+		}
+		sm.trans.activate(fadeIn, 2.0, fn)
+	}
+}
+
+// Draw info
+func (sm *stageMenu) drawInfo(g *graphics) {
+
+	startX := int32(8)
+	xoff := int32(-7)
+	difXoff := int32(-3)
+	startY := int32(184)
+	yoff := int32(16)
+
+	m := sm.maps[sm.cursor]
+	if m == nil {
+		return
+	}
+
+	// Get info
+	name := m.name
+	diff := m.difficulty
+	moves := m.moveLimit
+
+	// Draw info
+	g.drawText(sm.bmpFont, "NAME: "+name, startX, startY, xoff, 0, false)
+	// Draw difficulty
+	str := "DIFFICULTY: "
+	g.drawText(sm.bmpFont, str, startX, startY+yoff, xoff, 0, false)
+	g.drawText(sm.bmpFont, getDifficultyString(diff),
+		startX+int32(len(str))*(16+xoff), startY+yoff, difXoff, 0, false)
+	// Draw move limit
+	g.drawText(sm.bmpFont, "MOVE LIMIT: "+strconv.Itoa(moves),
+		startX, startY+yoff*2, xoff, 0, false)
 }
 
 // Draw
@@ -163,6 +209,9 @@ func (sm *stageMenu) draw(g *graphics) {
 		str := strconv.Itoa(i + 1)
 		g.drawText(sm.bmpNumbers, str, dx+20, dy+8, -20, 0, true)
 	}
+
+	// Draw info
+	sm.drawInfo(g)
 }
 
 // Destroy

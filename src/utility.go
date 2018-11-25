@@ -63,3 +63,21 @@ func drawBox(g *graphics, w, h int32) {
 	g.setGlobalColor(72, 72, 72, 72)
 	g.fillRect(128-w/2, 120-h/2, w, h)
 }
+
+// Get difficulty string
+func getDifficultyString(dif int) string {
+
+	ret := ""
+
+	// Full stars
+	for i := 0; i < int(dif/2); i++ {
+		ret += "#"
+	}
+
+	// Half stars
+	if dif%2 == 1 {
+		ret += "$"
+	}
+
+	return ret
+}
