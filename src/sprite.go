@@ -74,6 +74,13 @@ func (spr *sprite) animate(row, start, end int32, speed, tm float32) {
 	}
 }
 
+// Draw sprite frame
+func (spr *sprite) drawFrame(g *graphics, bmp *bitmap, frame, row int32, dx, dy int32, flip int) {
+
+	g.drawBitmapRegion(bmp, frame*spr.width, row*spr.height,
+		spr.width, spr.height, dx, dy, flip)
+}
+
 // Draw sprite
 func (spr *sprite) draw(g *graphics, bmp *bitmap, dx, dy int32, flip int) {
 

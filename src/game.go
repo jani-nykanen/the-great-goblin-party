@@ -54,7 +54,7 @@ func (t *game) quit() {
 
 	// Set transition callback
 	fn := func() {
-		t.evMan.terminate()
+		t.evMan.changeScene(0, "stagemenu")
 	}
 	// Activate transition
 	t.trans.activate(fadeIn, 2.0, fn)
@@ -141,6 +141,17 @@ func (t *game) destroy() {
 }
 
 // Scene changed
-func (t *game) onChange() {
+func (t *game) onChange(param int) {
 
+	// Deactive pause menu & info box
+	t.info.active = false
+	t.pauseScreen.active = false
+
+	// Reset
+	t.reset(param)
+}
+
+// Get name
+func (t *game) getName() string {
+	return "game"
 }

@@ -9,5 +9,6 @@ type scene interface {
 	update(input *inputManager, tm float32)
 	draw(g *graphics)
 	destroy()
-	onChange()
+	onChange(param int)
+	getName() string
 }

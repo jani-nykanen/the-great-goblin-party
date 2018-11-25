@@ -386,3 +386,25 @@ func (app *application) addScene(s scene, makeCurrent bool) {
 		app.currentScene = &s
 	}
 }
+
+// Change scene
+func (app *application) changeScene(param int, name string) {
+
+	s := scene(nil)
+	for i := 0; i < len(app.scenes); i++ {
+
+		if app.scenes[i].getName() == name {
+			s = app.scenes[i]
+			break
+		}
+	}
+
+	// If no corresponding scene found, stop
+	if s == nil {
+		return
+	}
+
+	// Otherwise switch to the scene
+	s.onChange(param)
+	app.currentScene = &s
+}

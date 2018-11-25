@@ -14,7 +14,14 @@ type eventManager struct {
 
 // Terminate application
 func (ev *eventManager) terminate() {
+
 	ev.app.terminate()
+}
+
+// Change scene
+func (ev *eventManager) changeScene(param int, name string) {
+
+	ev.app.changeScene(param, name)
 }
 
 // Create an event manager

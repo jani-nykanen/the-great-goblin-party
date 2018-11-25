@@ -21,6 +21,8 @@ func main() {
 		"assets/bitmaps/borders.png",
 		"assets/bitmaps/wall.png",
 		"assets/bitmaps/gremlin.png",
+		"assets/bitmaps/numbers.png",
+		"assets/bitmaps/button.png",
 		"",
 	}
 	bmpNames := []string{
@@ -29,6 +31,8 @@ func main() {
 		"borders",
 		"wall",
 		"gremlin",
+		"numbers",
+		"button",
 	}
 	mapPaths := []string{
 		"assets/maps/1.tmx",
@@ -68,8 +72,8 @@ func main() {
 	// Add key configuration
 	app.bindKeyConfig(kconf)
 	// Add scenes
-	g := new(game)
-	app.addScene(g, true)
+	app.addScene(new(game), false)
+	app.addScene(new(stageMenu), true)
 
 	// Load assets
 	err = app.loadAssets(bmpPaths, bmpNames, mapPaths, mapNames)
