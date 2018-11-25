@@ -4,7 +4,13 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
+)
+
+// Constants
+const (
+	savePath = "save.dat"
 )
 
 // Menu button type
@@ -27,6 +33,7 @@ type stageMenu struct {
 	buttons    [12]stageButton
 	cx, cy     int
 	cursor     int
+	saveMan    *saveManager
 }
 
 // Initialize
@@ -51,6 +58,23 @@ func (sm *stageMenu) init(g *graphics, trans *transition, evMan *eventManager, a
 
 		sm.maps[i] = ass.getTilemap(strconv.Itoa(i + 1))
 		sm.beaten[i] = false
+	}
+
+	// Load save file
+	sm.saveMan = createSaveManager()
+	err := sm.saveMan.loadFromFile(savePath)
+	if err != nil {
+		fmt.Println("An existing save file not found.")
+
+	} else {
+
+		// Read data
+		for i := 0; i < minInt(12, len(sm.saveMan.output)); i++ {
+
+			if sm.saveMan.output[i] != 0 {
+				sm.beaten[i] = true
+			}
+		}
 	}
 
 	// Set buttons
@@ -232,6 +256,27 @@ func (sm *stageMenu) onChange(param int) {
 	if param == 1 {
 		sm.beaten[sm.cursor] = true
 	}
+
+	// Store progression
+	// (We do not want to store an array of booleans,
+	// note that)
+	out := make([]byte, 12)
+	for i := 0; i < 12; i++ {
+
+		if sm.beaten[i] {
+			out[i] = 1
+		} else {
+			out[i] = 0
+		}
+	}
+	// Save data
+	err := sm.saveMan.saveToFile(out, savePath)
+	if err != nil {
+		fmt.Println("Failed to save game data. The following " +
+			"error was received:")
+		fmt.Println(err)
+	}
+
 }
 
 // Get name

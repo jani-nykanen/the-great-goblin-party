@@ -3,7 +3,7 @@
  <properties>
   <property name="difficulty" value="3"/>
   <property name="moves" value="20"/>
-  <property name="name" value="Sleep Heads"/>
+  <property name="name" value="Sleepyheads"/>
  </properties>
  <tileset firstgid="1" source="../../dev/editor_tiles.tsx"/>
  <layer name="Tile layer 1" width="8" height="7">
