@@ -38,7 +38,7 @@ func (t *game) showInfoBox(victory bool) {
 		t.readyReset()
 	}
 	fn2 := func() {
-		t.quit()
+		t.quit(1)
 	}
 
 	if victory {
@@ -50,11 +50,11 @@ func (t *game) showInfoBox(victory bool) {
 }
 
 // Quit
-func (t *game) quit() {
+func (t *game) quit(state int) {
 
 	// Set transition callback
 	fn := func() {
-		t.evMan.changeScene(0, "stagemenu")
+		t.evMan.changeScene(state, "stagemenu")
 	}
 	// Activate transition
 	t.trans.activate(fadeIn, 2.0, fn)

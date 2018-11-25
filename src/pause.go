@@ -80,7 +80,7 @@ func createPause(gameRef *game, ass *assetPack) *pause {
 		p.gameRef.readyReset()
 	}
 	cbs[2] = func() {
-		p.gameRef.quit()
+		p.gameRef.quit(0)
 	}
 	p.pauseMenu = createMenu(str, cbs)
 

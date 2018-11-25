@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" tiledversion="1.1.5" orientation="orthogonal" renderorder="right-down" width="8" height="7" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
  <properties>
-  <property name="difficulty" value="2"/>
-  <property name="moves" value="15"/>
-  <property name="name" value="First Steps"/>
+  <property name="difficulty" value="3"/>
+  <property name="moves" value="32"/>
+  <property name="name" value="So Tired"/>
  </properties>
  <tileset firstgid="1" source="../../dev/editor_tiles.tsx"/>
  <layer name="Tile layer 1" width="8" height="7">
   <data encoding="csv">
 1,1,1,1,1,1,1,1,
-1,0,1,0,2,0,0,1,
-1,0,2,0,0,1,1,1,
-1,2,0,0,1,1,5,1,
-1,1,1,0,0,0,0,1,
-1,0,2,0,2,1,2,1,
+1,0,2,0,0,0,5,1,
+1,2,0,1,2,1,0,1,
+1,1,0,1,0,1,0,1,
+1,0,0,8,0,2,0,1,
+1,2,1,0,0,1,0,1,
 1,1,1,1,1,1,1,1
 </data>
  </layer>

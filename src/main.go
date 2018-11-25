@@ -17,7 +17,6 @@ func main() {
 	// this time/yet)
 	bmpPaths := []string{
 		"assets/bitmaps/font.png",
-		"assets/bitmaps/goat.png",
 		"assets/bitmaps/borders.png",
 		"assets/bitmaps/wall.png",
 		"assets/bitmaps/gremlin.png",
@@ -27,7 +26,6 @@ func main() {
 	}
 	bmpNames := []string{
 		"font",
-		"goat",
 		"borders",
 		"wall",
 		"gremlin",
@@ -36,9 +34,32 @@ func main() {
 	}
 	mapPaths := []string{
 		"assets/maps/1.tmx",
+		"assets/maps/2.tmx",
+		"assets/maps/3.tmx",
+		"assets/maps/4.tmx",
+		"assets/maps/5.tmx",
+		"assets/maps/6.tmx",
+		"assets/maps/7.tmx",
+		"assets/maps/8.tmx",
+		"assets/maps/9.tmx",
+		"assets/maps/10.tmx",
+		"assets/maps/11.tmx",
+		"assets/maps/12.tmx",
+		"",
 	}
 	mapNames := []string{
 		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+		"7",
+		"8",
+		"9",
+		"10",
+		"11",
+		"12",
 	}
 
 	// Key configuration

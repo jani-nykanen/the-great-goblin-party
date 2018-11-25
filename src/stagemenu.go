@@ -21,6 +21,7 @@ type stageMenu struct {
 	bmpButton  *bitmap
 	bmpNumbers *bitmap
 	maps       [12]*tilemap
+	beaten     [12]bool
 	trans      *transition
 	evMan      *eventManager
 	buttons    [12]stageButton
@@ -45,10 +46,11 @@ func (sm *stageMenu) init(g *graphics, trans *transition, evMan *eventManager, a
 	sm.bmpNumbers = ass.getBitmap("numbers")
 	sm.bmpButton = ass.getBitmap("button")
 
-	// Get tilemaps
+	// Get tilemaps & set not to beaten
 	for i := 0; i < 12; i++ {
 
 		sm.maps[i] = ass.getTilemap(strconv.Itoa(i + 1))
+		sm.beaten[i] = false
 	}
 
 	// Set buttons
@@ -63,6 +65,7 @@ func (sm *stageMenu) init(g *graphics, trans *transition, evMan *eventManager, a
 			}
 		}
 	}
+	sm.buttons[0].spr.frame = 1
 
 	// Set default cursor positions
 	sm.cx = 0
@@ -207,6 +210,9 @@ func (sm *stageMenu) draw(g *graphics) {
 		sm.buttons[i].spr.draw(g, sm.bmpButton, dx, dy, flipNone)
 		// Draw stage index
 		str := strconv.Itoa(i + 1)
+		if sm.beaten[i] {
+			str = "#"
+		}
 		g.drawText(sm.bmpNumbers, str, dx+20, dy+8, -20, 0, true)
 	}
 
@@ -221,7 +227,11 @@ func (sm *stageMenu) destroy() {
 
 // Scene changed
 func (sm *stageMenu) onChange(param int) {
-	// ...
+
+	// If beaten
+	if param == 1 {
+		sm.beaten[sm.cursor] = true
+	}
 }
 
 // Get name
