@@ -161,7 +161,7 @@ func (sm *stageMenu) update(input *inputManager, tm float32) {
 	if input.getButton("cancel") == statePressed {
 
 		fn := func() {
-			sm.evMan.terminate()
+			sm.evMan.changeScene(0, "titlescreen")
 		}
 		sm.trans.activate(fadeIn, 2.0, fn)
 	}

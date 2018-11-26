@@ -79,13 +79,14 @@ func (g *graphics) setGlobalColor(rc, gc, bc, ac uint8) {
 }
 
 // Draw a bitmap
-func (g *graphics) drawBitmap(bmp *bitmap, dx, dy int32) {
+func (g *graphics) drawBitmap(bmp *bitmap, dx, dy int32, flip int) {
 
 	dx += g.tx
 	dy += g.ty
 
 	g.dst = sdl.Rect{X: dx, Y: dy, W: int32(bmp.width), H: int32(bmp.height)}
-	g.rend.Copy(bmp.texture, nil, &g.dst)
+	f := sdl.RendererFlip(flip)
+	g.rend.CopyEx(bmp.texture, nil, &g.dst, 0.0, nil, f)
 }
 
 // Draw a scaled bitmap

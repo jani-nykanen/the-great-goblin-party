@@ -52,7 +52,7 @@ func absFloat32(a float32) float32 {
 	return a
 }
 
-// Draw a nice box with borders. Always
+// Draw a nice box with border Always
 // in the center of the screen!
 func drawBox(g *graphics, w, h int32) {
 
@@ -80,4 +80,45 @@ func getDifficultyString(dif int) string {
 	}
 
 	return ret
+}
+
+// Draw borders
+func drawBorders(g *graphics, bmpBorders *bitmap, xpos, ypos, width, height int32) {
+
+	ypos -= 8
+	xpos -= 8
+	xjump := width*16 + 8
+	yjump := height*16 + 8
+
+	// Horizontal
+	for x := 0; x < int(width)*2; x++ {
+
+		// Top
+		g.drawBitmapRegion(bmpBorders, 8, 0, 8, 8,
+			xpos+8+int32(x)*8, ypos, flipNone)
+		// Bottom
+		g.drawBitmapRegion(bmpBorders, 8, 16, 8, 8,
+			xpos+8+int32(x)*8, ypos+yjump, flipNone)
+	}
+
+	// Vertical
+	for y := 0; y < int(height)*2; y++ {
+
+		// Left
+		g.drawBitmapRegion(bmpBorders, 0, 8, 8, 8,
+			xpos, ypos+int32(y)*8+8, flipNone)
+		// Right
+		g.drawBitmapRegion(bmpBorders, 16, 8, 8, 8,
+			xpos+xjump, ypos+int32(y)*8+8, flipNone)
+	}
+
+	// Corners
+	g.drawBitmapRegion(bmpBorders, 0, 0, 8, 8,
+		xpos, ypos, flipNone)
+	g.drawBitmapRegion(bmpBorders, 16, 0, 8, 8,
+		xpos+xjump, ypos, flipNone)
+	g.drawBitmapRegion(bmpBorders, 0, 16, 8, 8,
+		xpos, ypos+yjump, flipNone)
+	g.drawBitmapRegion(bmpBorders, 16, 16, 8, 8,
+		xpos+xjump, ypos+yjump, flipNone)
 }

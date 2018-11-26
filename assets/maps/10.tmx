@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.5" orientation="orthogonal" renderorder="right-down" width="9" height="8" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="9" height="8" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
  <properties>
   <property name="difficulty" value="5"/>
   <property name="moves" value="45"/>
-  <property name="name" value="Trinity"/>
+  <property name="name" value="Third Option"/>
  </properties>
  <tileset firstgid="1" source="../../dev/editor_tiles.tsx"/>
  <layer name="Tile layer 1" width="9" height="8">
