@@ -2,7 +2,7 @@
 <map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="10" height="8" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
  <properties>
   <property name="difficulty" value="6"/>
-  <property name="moves" value="99"/>
+  <property name="moves" value="60"/>
   <property name="name" value="Traffic Jam"/>
  </properties>
  <tileset firstgid="1" source="../../dev/editor_tiles.tsx"/>
