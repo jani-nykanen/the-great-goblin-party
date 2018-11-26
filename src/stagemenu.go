@@ -23,17 +23,18 @@ type stageButton struct {
 
 // Stage menu type
 type stageMenu struct {
-	bmpFont    *bitmap
-	bmpButton  *bitmap
-	bmpNumbers *bitmap
-	maps       [12]*tilemap
-	beaten     [12]bool
-	trans      *transition
-	evMan      *eventManager
-	buttons    [12]stageButton
-	cx, cy     int
-	cursor     int
-	saveMan    *saveManager
+	bmpFont      *bitmap
+	bmpButton    *bitmap
+	bmpNumbers   *bitmap
+	maps         [12]*tilemap
+	beaten       [12]bool
+	trans        *transition
+	evMan        *eventManager
+	buttons      [12]stageButton
+	cx, cy       int
+	cursor       int
+	saveMan      *saveManager
+	endingPlayed bool
 }
 
 // Initialize
@@ -91,9 +92,10 @@ func (sm *stageMenu) init(g *graphics, trans *transition, evMan *eventManager, a
 	}
 	sm.buttons[0].spr.frame = 1
 
-	// Set default cursor positions
+	// Set defaults
 	sm.cx = 0
 	sm.cy = 0
+	sm.endingPlayed = false
 
 	return nil
 }
@@ -261,10 +263,12 @@ func (sm *stageMenu) onChange(param int) {
 	// (We do not want to store an array of booleans,
 	// note that)
 	out := make([]byte, 12)
+	count := 0
 	for i := 0; i < 12; i++ {
 
 		if sm.beaten[i] {
 			out[i] = 1
+			count++
 		} else {
 			out[i] = 0
 		}
@@ -275,6 +279,13 @@ func (sm *stageMenu) onChange(param int) {
 		fmt.Println("Failed to save game data. The following " +
 			"error was received:")
 		fmt.Println(err)
+	}
+
+	// If every stage beaten, show ending
+	if count == 12 && !sm.endingPlayed {
+
+		sm.endingPlayed = true
+		sm.evMan.changeScene(0, "ending")
 	}
 
 }

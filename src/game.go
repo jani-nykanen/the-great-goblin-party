@@ -73,9 +73,6 @@ func (t *game) init(g *graphics, trans *transition, evMan *eventManager, ass *as
 	// Create info box
 	t.info = createInfoBox(ass)
 
-	// Fade out
-	t.trans.activate(fadeOut, 2.0, nil)
-
 	// Start with stage 1
 	t.reset(1)
 
