@@ -76,6 +76,7 @@ func main() {
 		"assets/audio/transform.wav",
 		"assets/audio/victory.wav",
 		"assets/audio/defeat.wav",
+		"assets/audio/reset.wav",
 		"",
 	}
 	sampleNames := []string{
@@ -89,6 +90,7 @@ func main() {
 		"transform",
 		"victory",
 		"defeat",
+		"reset",
 	}
 
 	// Key configuration

@@ -5,7 +5,7 @@ package main
 
 // Contants
 const (
-	themeVol = 0.65
+	themeVol = 0.70
 )
 
 // Game type
@@ -21,6 +21,7 @@ type game struct {
 	sPause      *sample
 	sVictory    *sample
 	sDefeat     *sample
+	sReset      *sample
 }
 
 // Reset
@@ -99,6 +100,7 @@ func (t *game) init(g *graphics, trans *transition, evMan *eventManager,
 	t.sPause = ass.getSample("pause")
 	t.sVictory = ass.getSample("victory")
 	t.sDefeat = ass.getSample("defeat")
+	t.sReset = ass.getSample("reset")
 
 	return nil
 }
@@ -138,6 +140,7 @@ func (t *game) update(input *inputManager, tm float32) {
 	if input.getButton("restart") == statePressed {
 		// t.reset(t.gameStage.index)
 		t.readyReset()
+		t.audio.playSample(t.sReset, 0.50)
 		return
 	}
 
