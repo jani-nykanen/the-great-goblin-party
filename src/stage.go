@@ -23,6 +23,8 @@ type stage struct {
 	bmpBorders     *bitmap
 	bmpWall        *bitmap
 	bmpGremlin     *bitmap
+	sMove          *sample
+	sTransform     *sample
 	xpos           int32
 	ypos           int32
 	gremlins       []*gremlin
@@ -85,13 +87,14 @@ func (s *stage) parseObjects() {
 }
 
 // Update stage
-func (s *stage) update(input *inputManager, tm float32) {
+func (s *stage) update(input *inputManager, audio *audioManager, tm float32) {
 
 	// Check if something is moving
 	// and check star collisions
 	s.oldMovingState = s.anyMoving
 	s.anyMoving = false
 	gremlinCount := 0
+	transforming := false
 	for i := 0; i < len(s.gremlins); i++ {
 
 		// Count existing gremlins
@@ -110,7 +113,18 @@ func (s *stage) update(input *inputManager, tm float32) {
 		if !s.anyMoving && s.gremlins[i].isActive() {
 
 			s.anyMoving = true
+			// Check if starting to transform
+			if s.gremlins[i].dying && !s.gremlins[i].transformPlayed {
+				transforming = true
+				s.gremlins[i].transformPlayed = true
+			}
 		}
+	}
+
+	// Play transformation sample
+	if transforming {
+
+		audio.playSample(s.sTransform, 0.30)
 	}
 
 	// If no gremlins left, victory
@@ -128,6 +142,9 @@ func (s *stage) update(input *inputManager, tm float32) {
 
 	// If something moved, reduce moves
 	if s.oldMovingState != s.anyMoving && s.anyMoving {
+
+		// Play sample
+		audio.playSample(s.sMove, 0.30)
 
 		s.moves--
 		// If negative moves, restart
@@ -346,6 +363,9 @@ func createStage(index int, ass *assetPack, gameRef *game) *stage {
 	s.bmpBorders = ass.getBitmap("borders")
 	s.bmpWall = ass.getBitmap("wall")
 	s.bmpGremlin = ass.getBitmap("gremlin")
+	s.sMove = ass.getSample("move")
+	s.sTransform = ass.getSample("transform")
+
 	// Get data
 	s.width = int32(s.baseMap.width)
 	s.height = int32(s.baseMap.height)

@@ -19,6 +19,8 @@ type game struct {
 	info        *infoBox
 	sTheme      *sample
 	sPause      *sample
+	sVictory    *sample
+	sDefeat     *sample
 }
 
 // Reset
@@ -34,6 +36,8 @@ func (t *game) readyReset() {
 	// Set transition callback
 	fn := func() {
 		t.reset(t.gameStage.index)
+		// Replay music
+		t.audio.playMusic(t.sTheme, themeVol)
 	}
 	// Activate transition
 	t.trans.activate(fadeIn, 2.0, fn)
@@ -42,6 +46,10 @@ func (t *game) readyReset() {
 // Show info box
 func (t *game) showInfoBox(victory bool) {
 
+	if t.info.active || t.trans.active {
+		return
+	}
+
 	fn1 := func() {
 		t.readyReset()
 	}
@@ -49,11 +57,14 @@ func (t *game) showInfoBox(victory bool) {
 		t.quit(1)
 	}
 
+	t.audio.stopMusic()
 	if victory {
 		t.info.activate("STAGE CLEAR!", fn2)
+		t.audio.playSample(t.sVictory, 0.60)
 
 	} else {
 		t.info.activate("OUT OF MOVES!", fn1)
+		t.audio.playSample(t.sDefeat, 0.80)
 	}
 }
 
@@ -86,6 +97,8 @@ func (t *game) init(g *graphics, trans *transition, evMan *eventManager,
 	// Get samples
 	t.sTheme = ass.getSample("theme")
 	t.sPause = ass.getSample("pause")
+	t.sVictory = ass.getSample("victory")
+	t.sDefeat = ass.getSample("defeat")
 
 	return nil
 }
@@ -129,7 +142,7 @@ func (t *game) update(input *inputManager, tm float32) {
 	}
 
 	// Update stage
-	t.gameStage.update(input, tm)
+	t.gameStage.update(input, t.audio, tm)
 }
 
 // Draw

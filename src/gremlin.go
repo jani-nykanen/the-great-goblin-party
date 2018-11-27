@@ -10,20 +10,21 @@ const (
 
 // Gremlin type
 type gremlin struct {
-	x, y          int32
-	tx, ty        int32
-	vx, vy        float32
-	moveTimer     float32
-	startedMoving bool
-	collisionSet  bool
-	stopped       bool
-	moving        bool
-	spr           sprite
-	color         int32
-	exist         bool
-	dying         bool
-	sleeping      bool
-	startRow      int32
+	x, y            int32
+	tx, ty          int32
+	vx, vy          float32
+	moveTimer       float32
+	startedMoving   bool
+	collisionSet    bool
+	stopped         bool
+	moving          bool
+	spr             sprite
+	color           int32
+	exist           bool
+	dying           bool
+	sleeping        bool
+	startRow        int32
+	transformPlayed bool
 }
 
 // Find a free tile
@@ -305,6 +306,7 @@ func createGremlin(x, y, color int32, s *stage, sleeping bool) *gremlin {
 	gr.moving = false
 	gr.exist = true
 	gr.dying = false
+	gr.transformPlayed = false
 
 	return gr
 }
