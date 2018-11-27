@@ -6,7 +6,7 @@ package main
 // Constants
 const (
 	startTimeMax    = 30
-	menuMusicVolume = 0.35
+	menuMusicVolume = 0.5
 )
 
 // Title screen type

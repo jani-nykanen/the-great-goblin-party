@@ -107,7 +107,7 @@ func (app *application) init(conf config) error {
 	// Create event manager
 	app.evMan = createEventManager(app)
 	// Create audio
-	app.audio = createAudioManager(1.0)
+	app.audio = createAudioManager(app.conf.volume)
 
 	// Create a slice for scenes
 	app.scenes = make([]scene, 0)

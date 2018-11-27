@@ -67,10 +67,12 @@ func main() {
 	}
 	samplePaths := []string{
 		"assets/audio/menu.wav",
+		"assets/audio/theme.wav",
 		"",
 	}
 	sampleNames := []string{
 		"menu",
+		"theme",
 	}
 
 	// Key configuration
@@ -92,6 +94,7 @@ func main() {
 		canvasHeight: 240,
 		frameRate:    30,
 		fullscreen:   false,
+		volume:       1.0,
 	}
 
 	// Initialize application

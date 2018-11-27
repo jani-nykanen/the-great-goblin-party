@@ -3,6 +3,11 @@
 
 package main
 
+// Contants
+const (
+	themeVol = 0.5
+)
+
 // Game type
 type game struct {
 	ass         *assetPack
@@ -12,6 +17,7 @@ type game struct {
 	audio       *audioManager
 	pauseScreen *pause
 	info        *infoBox
+	sTheme      *sample
 }
 
 // Reset
@@ -76,8 +82,8 @@ func (t *game) init(g *graphics, trans *transition, evMan *eventManager,
 	// Create info box
 	t.info = createInfoBox(ass)
 
-	// Start with stage 1
-	t.reset(1)
+	// Get samples
+	t.sTheme = ass.getSample("theme")
 
 	return nil
 }
@@ -145,6 +151,8 @@ func (t *game) onChange(param int) {
 
 	// Stop music
 	t.audio.stopMusic()
+	// Play theme
+	t.audio.playMusic(t.sTheme, themeVol)
 
 	// Deactive pause menu & info box
 	t.info.active = false

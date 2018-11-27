@@ -287,6 +287,9 @@ func (sm *stageMenu) onChange(param int) {
 		fmt.Println(err)
 	}
 
+	if sm.audio.loopSample != sm.sMenu {
+		sm.audio.stopMusic()
+	}
 	// Play music
 	sm.audio.playMusic(sm.sMenu, menuMusicVolume)
 

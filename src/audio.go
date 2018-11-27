@@ -23,7 +23,7 @@ func (a *audioManager) playSample(s *sample, vol float32) {
 		return
 	}
 
-	s.play(vol*a.vol, 1)
+	s.play(vol*a.vol, 0)
 }
 
 // Play music (aka: loop sample

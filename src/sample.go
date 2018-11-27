@@ -17,7 +17,7 @@ type sample struct {
 // Play sample
 func (s *sample) play(vol float32, loops int) {
 
-	v := int(float32(mix.MAX_VOLUME))
+	v := int(float32(mix.MAX_VOLUME) * vol)
 
 	if !s.played {
 

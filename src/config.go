@@ -12,4 +12,5 @@ type config struct {
 	canvasHeight int32
 	frameRate    int32
 	fullscreen   bool
+	volume       float32
 }
