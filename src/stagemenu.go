@@ -27,6 +27,9 @@ type stageMenu struct {
 	bmpButton    *bitmap
 	bmpNumbers   *bitmap
 	sMenu        *sample
+	sSelect      *sample
+	sAccept      *sample
+	sCancel      *sample
 	audio        *audioManager
 	maps         [12]*tilemap
 	beaten       [12]bool
@@ -59,6 +62,9 @@ func (sm *stageMenu) init(g *graphics, trans *transition,
 	sm.bmpButton = ass.getBitmap("button")
 	// Get samples
 	sm.sMenu = ass.getSample("menu")
+	sm.sAccept = ass.getSample("accept")
+	sm.sCancel = ass.getSample("cancel")
+	sm.sSelect = ass.getSample("select")
 
 	// Get tilemaps & set not to beaten
 	for i := 0; i < 12; i++ {
@@ -109,6 +115,9 @@ func (sm *stageMenu) init(g *graphics, trans *transition,
 // Update cursor
 func (sm *stageMenu) updateCursor(input *inputManager) {
 
+	oldX := sm.cx
+	oldY := sm.cy
+
 	// Update cursor
 	if input.getButton("left") == statePressed {
 		sm.cx--
@@ -132,6 +141,12 @@ func (sm *stageMenu) updateCursor(input *inputManager) {
 	}
 	sm.cy %= 3
 	sm.cx %= 4
+
+	// Cursor changed, play sound
+	if sm.cx != oldX || sm.cy != oldY {
+
+		sm.audio.playSample(sm.sSelect, 0.30)
+	}
 }
 
 // Update
@@ -159,6 +174,8 @@ func (sm *stageMenu) update(input *inputManager, tm float32) {
 	if input.getButton("start") == statePressed &&
 		sm.maps[sm.cursor] != nil {
 
+		sm.audio.playSample(sm.sAccept, 0.30)
+
 		fn := func() {
 			sm.evMan.changeScene(sm.cursor+1, "game")
 		}
@@ -167,6 +184,8 @@ func (sm *stageMenu) update(input *inputManager, tm float32) {
 
 	// Check escape button
 	if input.getButton("cancel") == statePressed {
+
+		sm.audio.playSample(sm.sCancel, 0.30)
 
 		fn := func() {
 			sm.evMan.changeScene(0, "titlescreen")

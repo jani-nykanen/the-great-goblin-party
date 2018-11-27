@@ -6,7 +6,7 @@ package main
 // Constants
 const (
 	startTimeMax    = 30
-	menuMusicVolume = 0.5
+	menuMusicVolume = 0.75
 )
 
 // Title screen type
@@ -15,6 +15,8 @@ type titleScreen struct {
 	bmpLogo    *bitmap
 	bmpBorders *bitmap
 	sMenu      *sample
+	sPause     *sample
+	sCancel    *sample
 	trans      *transition
 	evMan      *eventManager
 	audio      *audioManager
@@ -38,6 +40,8 @@ func (ts *titleScreen) init(g *graphics, trans *transition, evMan *eventManager,
 	ts.bmpBorders = ass.getBitmap("borders")
 	// Get samples
 	ts.sMenu = ass.getSample("menu")
+	ts.sCancel = ass.getSample("cancel")
+	ts.sPause = ass.getSample("pause")
 
 	// Set defaults
 	ts.phase = 0
@@ -54,7 +58,7 @@ func (ts *titleScreen) init(g *graphics, trans *transition, evMan *eventManager,
 		ts.trans.activate(fadeIn, 2.0, ts.evMan.terminate)
 	}
 	ts.tmenu = createMenu([]string{"Start game", "Quit"},
-		[]cbfun{fn1, fn2})
+		[]cbfun{fn1, fn2}, ass)
 
 	return nil
 }
@@ -64,6 +68,8 @@ func (ts *titleScreen) update(input *inputManager, tm float32) {
 
 	// Check escape
 	if input.getButton("cancel") == statePressed {
+
+		ts.audio.playSample(ts.sCancel, 0.30)
 
 		// Quit
 		ts.trans.activate(fadeIn, 2.0, ts.evMan.terminate)
@@ -79,13 +85,14 @@ func (ts *titleScreen) update(input *inputManager, tm float32) {
 
 		// Check enter
 		if input.getButton("start") == statePressed {
+			ts.audio.playSample(ts.sPause, 0.30)
 			ts.phase++
 		}
 
 	} else {
 
 		// Update menu
-		ts.tmenu.update(input)
+		ts.tmenu.update(input, ts.audio)
 	}
 }
 
@@ -119,7 +126,7 @@ func (ts *titleScreen) draw(g *graphics) {
 	} else {
 
 		// Draw menu
-		ts.tmenu.drawMenu(g, ts.bmpFont,
+		ts.tmenu.drawMenu(g,
 			menuX,
 			menuY, 20)
 	}

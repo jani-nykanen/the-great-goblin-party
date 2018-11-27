@@ -14,10 +14,13 @@ type menu struct {
 	buttons   []menuButton
 	cursorPos int
 	length    int
+	bmpFont   *bitmap
+	sSelect   *sample
+	sAccept   *sample
 }
 
 // Update
-func (m *menu) update(input *inputManager) {
+func (m *menu) update(input *inputManager, audio *audioManager) {
 
 	// Update cursor pos
 	oldPos := m.cursorPos
@@ -41,6 +44,8 @@ func (m *menu) update(input *inputManager) {
 	// Check if enter pressed
 	if input.getButton("start") == statePressed {
 
+		audio.playSample(m.sAccept, 0.30)
+
 		// Call callback function, if defined
 		if m.buttons[m.cursorPos].cb != nil {
 
@@ -50,12 +55,13 @@ func (m *menu) update(input *inputManager) {
 
 	// Check if cursor position changed
 	if m.cursorPos != oldPos {
-		// Play sound
+
+		audio.playSample(m.sSelect, 0.30)
 	}
 }
 
 // Draw menu
-func (m *menu) drawMenu(g *graphics, bmpFont *bitmap, dx, dy, yoff int32) {
+func (m *menu) drawMenu(g *graphics, dx, dy, yoff int32) {
 
 	xoff := int32(-6)
 
@@ -70,12 +76,12 @@ func (m *menu) drawMenu(g *graphics, bmpFont *bitmap, dx, dy, yoff int32) {
 		str += m.buttons[i].text
 
 		// Draw "button"
-		g.drawText(bmpFont, str, dx, dy+yoff*i, xoff, 0, false)
+		g.drawText(m.bmpFont, str, dx, dy+yoff*i, xoff, 0, false)
 	}
 }
 
 // Create a menu
-func createMenu(text []string, cbs []cbfun) *menu {
+func createMenu(text []string, cbs []cbfun, ass *assetPack) *menu {
 
 	m := new(menu)
 
@@ -87,6 +93,11 @@ func createMenu(text []string, cbs []cbfun) *menu {
 			text[i], cbs[i],
 		}
 	}
+
+	// Get assets
+	m.bmpFont = ass.getBitmap("font")
+	m.sAccept = ass.getSample("accept")
+	m.sSelect = ass.getSample("select")
 
 	// Set cursor position
 	m.cursorPos = 0

@@ -12,14 +12,14 @@ type pause struct {
 }
 
 // Update
-func (p *pause) update(input *inputManager) {
+func (p *pause) update(input *inputManager, audio *audioManager) {
 
 	if !p.active {
 		return
 	}
 
 	// Update pause menu
-	p.pauseMenu.update(input)
+	p.pauseMenu.update(input, audio)
 
 	// Check if escape pressed
 	if input.getButton("cancel") == statePressed {
@@ -47,7 +47,7 @@ func (p *pause) draw(g *graphics) {
 	drawBox(g, w, h)
 
 	// Draw menu
-	p.pauseMenu.drawMenu(g, p.bmpFont, 128-w/2+menuX, 120-h/2+menuY, yoff)
+	p.pauseMenu.drawMenu(g, 128-w/2+menuX, 120-h/2+menuY, yoff)
 }
 
 // Activate
@@ -82,7 +82,7 @@ func createPause(gameRef *game, ass *assetPack) *pause {
 	cbs[2] = func() {
 		p.gameRef.quit(0)
 	}
-	p.pauseMenu = createMenu(str, cbs)
+	p.pauseMenu = createMenu(str, cbs, ass)
 
 	// Get assets
 	p.bmpFont = ass.getBitmap("font")

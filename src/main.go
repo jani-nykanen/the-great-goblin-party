@@ -68,11 +68,19 @@ func main() {
 	samplePaths := []string{
 		"assets/audio/menu.wav",
 		"assets/audio/theme.wav",
+		"assets/audio/accept.wav",
+		"assets/audio/select.wav",
+		"assets/audio/cancel.wav",
+		"assets/audio/pause.wav",
 		"",
 	}
 	sampleNames := []string{
 		"menu",
 		"theme",
+		"accept",
+		"select",
+		"cancel",
+		"pause",
 	}
 
 	// Key configuration
@@ -87,7 +95,7 @@ func main() {
 
 	// Create default configuration
 	conf := config{
-		caption:      "The Great Gremlin Party",
+		caption:      "The Great Goblin Party",
 		winWidth:     512,
 		winHeight:    480,
 		canvasWidth:  256,

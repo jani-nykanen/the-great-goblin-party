@@ -5,7 +5,7 @@ package main
 
 // Contants
 const (
-	themeVol = 0.5
+	themeVol = 0.65
 )
 
 // Game type
@@ -18,6 +18,7 @@ type game struct {
 	pauseScreen *pause
 	info        *infoBox
 	sTheme      *sample
+	sPause      *sample
 }
 
 // Reset
@@ -84,6 +85,7 @@ func (t *game) init(g *graphics, trans *transition, evMan *eventManager,
 
 	// Get samples
 	t.sTheme = ass.getSample("theme")
+	t.sPause = ass.getSample("pause")
 
 	return nil
 }
@@ -95,12 +97,14 @@ func (t *game) update(input *inputManager, tm float32) {
 
 		// Check if pause enabled
 		if t.pauseScreen.active {
-			t.pauseScreen.update(input)
+			t.pauseScreen.update(input, t.audio)
 			return
 		}
 		// Otherwise check if pause is to be enabled
 		if input.getButton("start") == statePressed ||
 			input.getButton("cancel") == statePressed {
+
+			t.audio.playSample(t.sPause, 0.30)
 
 			t.pauseScreen.activate()
 			return
