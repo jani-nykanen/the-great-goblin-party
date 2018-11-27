@@ -293,7 +293,7 @@ func (s *stage) drawInfo(g *graphics) {
 		bottomXOff+int32(len(str)*10)+difMinusX, 240-bottomY, starXoff, 0, false)
 
 	// Draw moves
-	str = "Moves: " + strconv.Itoa(s.moves)
+	str = "Moves: " + strconv.Itoa(maxInt(s.moves, 0))
 	g.drawText(s.bmpFont, str,
 		256-int32(len(str)+1)*10+bottomXOff,
 		240-bottomY, xoff, 0, false)

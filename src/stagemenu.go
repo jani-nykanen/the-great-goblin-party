@@ -313,7 +313,8 @@ func (sm *stageMenu) onChange(param int) {
 	sm.audio.playMusic(sm.sMenu, menuMusicVolume)
 
 	// If every stage beaten, show ending
-	if count == 12 && !sm.endingPlayed {
+
+	if count == 12 && param != 0 && !sm.endingPlayed {
 
 		sm.endingPlayed = true
 		sm.evMan.changeScene(0, "ending")

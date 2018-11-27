@@ -411,6 +411,7 @@ func (app *application) changeScene(param int, name string) {
 	}
 
 	// Otherwise switch to the scene
-	s.onChange(param)
 	app.currentScene = &s
+	s.onChange(param)
+
 }
