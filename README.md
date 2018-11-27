@@ -1,5 +1,5 @@
-Another Go experiment. Will very likely fail.
+![](https://cdn.discordapp.com/attachments/235123827279921155/517057165798801408/thumb_itch.png)
 
-Coming soon, or at least disappearing soon!
+COMING SOON (tomorrow, likely)
 
 (c) 2018 Jani Nykänen
