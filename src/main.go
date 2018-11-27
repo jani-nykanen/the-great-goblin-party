@@ -65,6 +65,13 @@ func main() {
 		"11",
 		"12",
 	}
+	samplePaths := []string{
+		"assets/audio/menu.wav",
+		"",
+	}
+	sampleNames := []string{
+		"menu",
+	}
 
 	// Key configuration
 	kconf := createKeyConfig()
@@ -104,7 +111,7 @@ func main() {
 	app.addScene(new(intro), true)
 
 	// Load assets
-	err = app.loadAssets(bmpPaths, bmpNames, mapPaths, mapNames)
+	err = app.loadAssets(bmpPaths, bmpNames, mapPaths, mapNames, samplePaths, sampleNames)
 	if err != nil {
 		log.Fatal(err)
 		return

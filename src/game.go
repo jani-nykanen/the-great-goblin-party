@@ -9,6 +9,7 @@ type game struct {
 	gameStage   *stage
 	trans       *transition
 	evMan       *eventManager
+	audio       *audioManager
 	pauseScreen *pause
 	info        *infoBox
 }
@@ -61,12 +62,14 @@ func (t *game) quit(state int) {
 }
 
 // Initialize
-func (t *game) init(g *graphics, trans *transition, evMan *eventManager, ass *assetPack) error {
+func (t *game) init(g *graphics, trans *transition, evMan *eventManager,
+	audio *audioManager, ass *assetPack) error {
 
 	// Store references for future use
 	t.ass = ass
 	t.trans = trans
 	t.evMan = evMan
+	t.audio = audio
 
 	// Create pause screen
 	t.pauseScreen = createPause(t, ass)
@@ -139,6 +142,9 @@ func (t *game) destroy() {
 
 // Scene changed
 func (t *game) onChange(param int) {
+
+	// Stop music
+	t.audio.stopMusic()
 
 	// Deactive pause menu & info box
 	t.info.active = false

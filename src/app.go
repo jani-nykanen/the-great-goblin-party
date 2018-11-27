@@ -24,6 +24,7 @@ type application struct {
 	assets       *assetPack
 	trans        *transition
 	evMan        *eventManager
+	audio        *audioManager
 }
 
 // Initialize SDL2 content
@@ -105,6 +106,8 @@ func (app *application) init(conf config) error {
 	app.trans = createTransition()
 	// Create event manager
 	app.evMan = createEventManager(app)
+	// Create audio
+	app.audio = createAudioManager(1.0)
 
 	// Create a slice for scenes
 	app.scenes = make([]scene, 0)
@@ -341,7 +344,7 @@ func (app *application) run() error {
 	for i := 0; i < len(app.scenes); i++ {
 
 		s = app.scenes[i]
-		err = s.init(app.g, app.trans, app.evMan, app.assets)
+		err = s.init(app.g, app.trans, app.evMan, app.audio, app.assets)
 		if err != nil {
 
 			return err
@@ -364,10 +367,13 @@ func (app *application) run() error {
 }
 
 // Load assets (before running!)
-func (app *application) loadAssets(bmpList, bmpNames, mapList, mapNames []string) error {
+func (app *application) loadAssets(bmpList, bmpNames,
+	mapList, mapNames,
+	sampleList, sampleNames []string) error {
 
 	var err error
-	app.assets, err = createAssetPack(app.g, bmpList, bmpNames, mapList, mapNames)
+	app.assets, err = createAssetPack(app.g, bmpList, bmpNames,
+		mapList, mapNames, sampleList, sampleNames)
 
 	return err
 }

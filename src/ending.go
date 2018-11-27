@@ -18,7 +18,8 @@ type ending struct {
 }
 
 // Initialize
-func (e *ending) init(g *graphics, trans *transition, evMan *eventManager, ass *assetPack) error {
+func (e *ending) init(g *graphics, trans *transition,
+	evMan *eventManager, audio *audioManager, ass *assetPack) error {
 
 	// Store references
 	e.trans = trans

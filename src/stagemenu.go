@@ -26,6 +26,8 @@ type stageMenu struct {
 	bmpFont      *bitmap
 	bmpButton    *bitmap
 	bmpNumbers   *bitmap
+	sMenu        *sample
+	audio        *audioManager
 	maps         [12]*tilemap
 	beaten       [12]bool
 	trans        *transition
@@ -38,7 +40,8 @@ type stageMenu struct {
 }
 
 // Initialize
-func (sm *stageMenu) init(g *graphics, trans *transition, evMan *eventManager, ass *assetPack) error {
+func (sm *stageMenu) init(g *graphics, trans *transition,
+	evMan *eventManager, audio *audioManager, ass *assetPack) error {
 
 	buttonYStart := int32(32)
 	buttonYOff := int32(48)
@@ -48,11 +51,14 @@ func (sm *stageMenu) init(g *graphics, trans *transition, evMan *eventManager, a
 	// Store references
 	sm.trans = trans
 	sm.evMan = evMan
+	sm.audio = audio
 
 	// Get bitmaps
 	sm.bmpFont = ass.getBitmap("font")
 	sm.bmpNumbers = ass.getBitmap("numbers")
 	sm.bmpButton = ass.getBitmap("button")
+	// Get samples
+	sm.sMenu = ass.getSample("menu")
 
 	// Get tilemaps & set not to beaten
 	for i := 0; i < 12; i++ {
@@ -280,6 +286,9 @@ func (sm *stageMenu) onChange(param int) {
 			"error was received:")
 		fmt.Println(err)
 	}
+
+	// Play music
+	sm.audio.playMusic(sm.sMenu, menuMusicVolume)
 
 	// If every stage beaten, show ending
 	if count == 12 && !sm.endingPlayed {

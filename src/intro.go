@@ -13,7 +13,8 @@ type intro struct {
 }
 
 // Initialize
-func (t *intro) init(g *graphics, trans *transition, evMan *eventManager, ass *assetPack) error {
+func (t *intro) init(g *graphics, trans *transition, evMan *eventManager,
+	audio *audioManager, ass *assetPack) error {
 
 	// Store references
 	t.trans = trans

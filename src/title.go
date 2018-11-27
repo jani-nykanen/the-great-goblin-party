@@ -5,7 +5,8 @@ package main
 
 // Constants
 const (
-	startTimeMax = 30
+	startTimeMax    = 30
+	menuMusicVolume = 0.35
 )
 
 // Title screen type
@@ -13,24 +14,30 @@ type titleScreen struct {
 	bmpFont    *bitmap
 	bmpLogo    *bitmap
 	bmpBorders *bitmap
+	sMenu      *sample
 	trans      *transition
 	evMan      *eventManager
+	audio      *audioManager
 	phase      int
 	startTimer float32
 	tmenu      *menu
 }
 
 // Initialize
-func (ts *titleScreen) init(g *graphics, trans *transition, evMan *eventManager, ass *assetPack) error {
+func (ts *titleScreen) init(g *graphics, trans *transition, evMan *eventManager,
+	audio *audioManager, ass *assetPack) error {
 
 	// Store references
 	ts.trans = trans
 	ts.evMan = evMan
+	ts.audio = audio
 
 	// Get bitmaps
 	ts.bmpFont = ass.getBitmap("font")
 	ts.bmpLogo = ass.getBitmap("logo")
 	ts.bmpBorders = ass.getBitmap("borders")
+	// Get samples
+	ts.sMenu = ass.getSample("menu")
 
 	// Set defaults
 	ts.phase = 0
@@ -129,8 +136,8 @@ func (ts *titleScreen) destroy() {
 // Scene changed
 func (ts *titleScreen) onChange(param int) {
 
-	// ...
-
+	// Play music
+	ts.audio.playMusic(ts.sMenu, menuMusicVolume)
 }
 
 // Get name
